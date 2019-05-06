@@ -556,11 +556,13 @@ These modular nature of Theater lends itself well to a TDD approach - for each p
 This is my first real open-source project that I'll be maintaining, I'd love contributions, questions, criticism, or guidance!
 
 ## Contact
-Web: http://nicomee.com
-Email: nico@nicomee.com
+http://nicomee.com
+
+nico@nicomee.com
 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLT
+E5MTA3MjA0Ml19
 -->
