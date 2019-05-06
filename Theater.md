@@ -540,10 +540,10 @@ These scenes are:
  - JustClickAwareScene (exports `JustClickAwareScene.WithSpinner`,
    `JustClickAwareScene.WithoutSpinner `
    
-   JustClickScene: will just-click any selector specified - perfect for
+ - JustClickScene: will just-click any selector specified - perfect for
    closing annoying modals, CTAs, extending session, etc
    
-   SpinnerAwareScene: (will wait for any spinners/loading modals to
+ - SpinnerAwareScene: (will wait for any spinners/loading modals to
    dissapear before continuing to`play()` the Show.
 
 You can find some real-examples of this in the `classes/theater/shows` folder.
@@ -562,5 +562,5 @@ Email: nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjUyMTU3MjYyLC0xOTEwNzIwNDJdfQ==
+eyJoaXN0b3J5IjpbLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
