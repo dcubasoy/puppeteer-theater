@@ -537,11 +537,14 @@ I have written a basic React boilerplate that demonstrates how this works (see `
 When working with complex automation tasks, I've found setting up a few boilerplate Scenes before I do anything else saves me a lot of time. 
 These scenes are: 
 
-**JustClickAwareScene** (exports `JustClickAwareScene.WithSpinner`, `JustClickAwareScene.WithoutSpinner `
-
-**JustClickScene** ` (will just-click any selector specified - closing modals, extending session, etc.), 
-
-**SpinnerAwareScene**` (will wait for any spinners/loading modals to dissapear before continuing to`play()` the Show.
+ - JustClickAwareScene (exports `JustClickAwareScene.WithSpinner`,
+   `JustClickAwareScene.WithoutSpinner `
+   
+   JustClickScene: will just-click any selector specified - perfect for
+   closing annoying modals, CTAs, extending session, etc
+   
+   SpinnerAwareScene: (will wait for any spinners/loading modals to
+   dissapear before continuing to`play()` the Show.
 
 You can find some real-examples of this in the `classes/theater/shows` folder.
 
@@ -559,5 +562,5 @@ Email: nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbMjUyMTU3MjYyLC0xOTEwNzIwNDJdfQ==
 -->
