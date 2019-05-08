@@ -6,7 +6,8 @@ Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Th
 In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration- there's more!). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.  
 
 Imagine: never having to call `waitForNavigation().`Theater is matching scenes with the screen (literally), consequently, it needs none of this nonsense.
-I plan on adding evaluating whether navigation is occuring should be implemented down the line to avoid the need t
+
+I plan on adding evaluating whether navigation is occuring (and restricting matching based on this) in my next major change. This will considerably improve the fluidity between scenes since the browser will know a navigation is in progress and 
 
 Tested & Fully Compatible with both puppeteer@1.15.0 & puppeteer-firefox@0.5.0.
 
@@ -568,6 +569,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTA1MzIxMTQ5LC0xODkwMjExODE2LC0xMT
+eyJoaXN0b3J5IjpbMTc2MjM4NzAyLC0xODkwMjExODE2LC0xMT
 U3NjAzNzI0LC0xOTEwNzIwNDJdfQ==
 -->
