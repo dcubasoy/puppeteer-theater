@@ -96,7 +96,7 @@ This method will play the show. Iterating through out all the `Scenes` and `play
 
 ##  class: Scene
 
-This example scene will simply click #session_btn_continue. In the first example, 
+This example scene will simply click #session_btn_continue. In the first example using `Scene.Extensions.Click()` and in the second using the basic 
 ```js
 class ClickExtendScene extends Scene {
   constructor(args) {
@@ -567,5 +567,5 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjA5NTEzMzU3Ml19
+eyJoaXN0b3J5IjpbNjU0MDA1MDUxLDIwOTUxMzM1NzJdfQ==
 -->
