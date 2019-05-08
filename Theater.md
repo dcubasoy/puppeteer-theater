@@ -1,7 +1,7 @@
 
 ##  Purpose & Inspiration
 
-Theater: a one of a kind bot-development platform 
+Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Theater makes your complex, difficult (common reasons: there is bot detection 
 
 Tested & Fully Compatible with both puppeteer@1.15.0 & puppeteer-firefox@0.5.0.
 
@@ -563,6 +563,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTYyMjUyNTg4MywtMTg5MDIxMTgxNiwtMT
-E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
+eyJoaXN0b3J5IjpbLTE3MzIxMjY5MTMsLTE4OTAyMTE4MTYsLT
+ExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
