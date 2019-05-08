@@ -203,7 +203,21 @@ class PuppeteerBot {
     this.enableRequestInterception = enableRequestInterception;
   }
 
-
+  /**
+   *
+   * @description
+   * @static
+   * @param {*} page
+   * @param {*} [{
+   *     browserUniqueID,
+   *     logger,
+   *     minWidth = 1280,
+   *     minHeight = 1024,
+   *     disguiseFlags = [],
+   *     emulateFlag = 'desktop',
+   *   }={}]
+   * @memberof PuppeteerBot
+   */
   static async disguisePage(page, {
     browserUniqueID,
     logger,
@@ -213,14 +227,6 @@ class PuppeteerBot {
     emulateFlag = 'desktop',
   } = {}) {
     const fingerprint = getBrowserfingerprint(browserUniqueID, emulateFlag);
-    logger.info(`fingerprint-webgl-vendor-${fingerprint.WEBGL_VENDOR}`);
-    logger.info(`fingerprint-webgl-renderer-${fingerprint.WEBGL_RENDERER}`);
-    logger.info(`fingerprint-ua-ua-${fingerprint.userAgent}`);
-    logger.info(`fingerprint-ua-platform-${fingerprint.platform}`);
-    logger.info(`fingerprint-deviceCategory-${fingerprint.deviceCategory}`);
-    logger.info(`fingerprint-viewportHeight-${fingerprint.viewportHeight}`);
-    logger.info(`fingerprint-viewportWidth-${fingerprint.viewportWidth}`);
-
 
     const LOG_OVERRIDE = true;
     if (LOG_OVERRIDE) {
@@ -414,7 +420,7 @@ class PuppeteerBot {
       window.__defineGetter__('webkitRTCPeerConnection', () => logOverride('webkitRTCPeerConnection', undefined));
       window.__defineGetter__('webkitRTCSessionDescription', () => logOverride('webkitRTCSessionDescription', undefined));
 
-      // canvas
+      // this will pass canvas detection
       if (!F.has('-canvas')) {
         class WebGLRenderingContext {
           constructor(cvs) {
@@ -566,7 +572,14 @@ class PuppeteerBot {
     await page.setDefaultTimeout(120000);
   }
 
-  /* eslint-disable */
+
+
+  /**
+   * @description: Resolves a CaptchaTask using supported provider AntiCaptcha
+   * @param {*} task
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async resolveCaptchaTask(task) {
     const [, captchaRequestBody] = await rp({
       url: 'https://api.anti-captcha.com/createTask',
@@ -620,6 +633,12 @@ class PuppeteerBot {
   /* eslint-enable */
 
 
+  /**
+   * @description: Solves captcha and retuns solution (Only ImageToText)
+   * @param {*} buffer
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async resolveCaptcha(buffer) {
     try {
       if (!Buffer.isBuffer(buffer)) {
@@ -641,11 +660,76 @@ class PuppeteerBot {
     }
   }
 
+  async uploadBlob(file, contentType, buffer) {
+    const container = 'puppeteer-bot-2-dump';
+    const filename = `${this.label}-${parseInt(Date.now() / 1000 / 60 / 60 / 24 / 7, 10)}/${file}`;
 
-  async dump(rootObj = {}) {
-    return rootObj;
+    return new Promise((resolve, reject) => {
+        const stream = azure.blob.createWriteStreamToBlockBlob(
+            container,
+            filename, {
+                contentType,
+                contentSettings: {
+                    contentType,
+                },
+            },
+            (err) => {
+                if (err) reject(err);
+                resolve(`https://anonyblob2.blob.core.windows.net/${container}/${filename}`);
+            },
+        );
+        stream.write(buffer);
+        stream.end();
+    });
   }
 
+
+  /**
+   * @description: dumps active html browser content and screenshot to Azure storage blob service.
+   * @param {*} [rootObj={}]
+   * @returns
+   * @memberof PuppeteerBot
+   */
+  async dump(rootObj = {}) {
+      try {
+          if (this.page) {
+              const blobUrlContent = await this.uploadBlob(
+                  `content/${uuid()}-${Date.now()}.html`,
+                  'text/html',
+                  Buffer.from(await puppeteerErrorRetry(async() => this.page.content())),
+              );
+              Object.assign(rootObj, {
+                  blobUrlContent,
+              });
+          }
+      } catch (error) {
+          //
+      }
+
+      try {
+          if (this.page) {
+              const blobUrlScreenshot = await this.uploadBlob(
+                  `screenshots/${uuid()}-${Date.now()}.png`,
+                  'image/png',
+                  await puppeteerErrorRetry(async() => this.page.screenshot()),
+              );
+              Object.assign(rootObj, {
+                  blobUrlScreenshot,
+              });
+          }
+      } catch (error) {
+          //
+      }
+
+      return rootObj;
+  }
+
+
+
+  /**
+   * @description: initializes the puppeteer bot & imports chrome user data, cookies, etc if specified
+   * @memberof PuppeteerBot
+   */
   async init() {
     if (this.credential) {
       await this.importCredential(this.credential);
@@ -742,6 +826,14 @@ class PuppeteerBot {
     this.incompleteRequests = [];
   }
 
+
+  /**
+   * @description: For given selector attempt to check the corresponding element - as in a checkbox.
+   * @param {*} query
+   * @param {boolean} [value=true]
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async check(query, value = true) {
     const handles = await puppeteerErrorRetry(async () => this.page.$$(query));
 
@@ -759,6 +851,13 @@ class PuppeteerBot {
   }
 
 
+  /**
+   * @description: Checks if ElementHandle has been checked properly
+   * @param {*} handle
+   * @param {boolean} [value=true]
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async checkElementHandle(handle, value = true) {
     let worked = null;
     worked = worked || false;
@@ -772,7 +871,6 @@ class PuppeteerBot {
     return worked;
   }
 
-
   async $$safeEval(q, fn, ...args) {
     try {
       return await puppeteerErrorRetry(async () => this.page.$$eval(q, fn, ...args));
@@ -784,6 +882,14 @@ class PuppeteerBot {
     }
   }
 
+
+  /**
+   * @description: Critical function that gets all visible element handles on the DOM for a given CSS selector.
+   * @param {*} selector
+   * @param {boolean} [shouldIncludeInvisible=false]
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async $$(selector, shouldIncludeInvisible = false) {
     const includeInvisible = !!shouldIncludeInvisible;
     if (!this.internal$$batches) this.internal$$batches = [];
@@ -869,6 +975,15 @@ class PuppeteerBot {
     return promise;
   }
 
+
+
+  /**
+   * @description
+   * @param {*} q: CSS selector
+   * @param {*} opt: value to fill
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async fill(q, opt) {
     if (!opt) return false;
 
@@ -885,6 +1000,14 @@ class PuppeteerBot {
     return worked;
   }
 
+
+  /**
+   * @description: checks ElementHandle to verify if filled correctly
+   * @param {*} handle
+   * @param {*} opt
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async checkFillElementHandle(handle, opt) {
     return puppeteerErrorRetry(async () => {
       if (!opt) return false;
@@ -909,6 +1032,13 @@ class PuppeteerBot {
   }
 
 
+  /**
+   * @description: peforms a dirty select on item inside drop-down list
+   * @param {*} q
+   * @param {*} opt
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async $select(q, opt) {
     if (!opt) return false;
 
@@ -926,6 +1056,14 @@ class PuppeteerBot {
     return true;
   }
 
+
+  /**
+   * @description: will scroll into view safely, hover, hestitate for a ranodm delay, and invoke class member clickElementHandle()
+   * @param {*} handle
+   * @param {*} opt
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async fillElementHandle(handle, opt) {
     return puppeteerErrorRetry(async () => {
       if (!opt) return false;
@@ -992,6 +1130,7 @@ class PuppeteerBot {
     });
   }
 
+
   async click(selector) {
     const elementHandles = await this.page.$$(selector);
     let result = false;
@@ -1043,6 +1182,15 @@ class PuppeteerBot {
     }
   }
 
+
+  /**
+   * @description:
+   * scrollIntoViewIfNeeded(), evaluate boundingBox
+   * [calculate randomized offset from center coordinates of element].[move mouse with randomized step between ms movements] to designated coordinates
+   * [click using randomized behavioral context]
+   * @param {*} handle
+   * @memberof PuppeteerBot
+   */
   async clickElementHandle(handle) {
     return puppeteerErrorRetry(async () => {
       if (!handle) {
@@ -1342,12 +1490,11 @@ class PuppeteerBot {
     }
   }
 
-
-  async loadCredentials() {
-    await this.loadCookies();
-    await this.loadUserData();
-  }
-
+  /**
+   * @description: Imports a credential: establishes exact copy of prior file structure/chrome executable, sets cookies.
+   * @param {*} zbuf
+   * @memberof PuppeteerBot
+   */
   async importCredential(zbuf) {
     await new Promise((resolve, reject) => {
       zlib.gunzip(Buffer.from(zbuf, 'base64'), (err, buf) => {
@@ -1360,6 +1507,11 @@ class PuppeteerBot {
     await this.loadCredentials();
   }
 
+  /**
+   * @description: Returns a cookie jar
+   * @param {*}
+   * @memberof PuppeteerBot
+   */
   async getRequestCookieJar() {
     const jar = request.jar();
 
@@ -1382,6 +1534,13 @@ class PuppeteerBot {
     return jar;
   }
 
+
+
+  /**
+   * @description: loads cookies (all- both default and puppeteer-cookies)
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async loadCookies() {
     if (!this.parsedCredential || !this.parsedCredential.cookies || !this.page) return;
 
@@ -1425,6 +1584,13 @@ class PuppeteerBot {
     stream.end(Buffer.isBuffer(this.parsedCredential.chromeUserData) ? this.parsedCredential.chromeUserData : Buffer.from(this.parsedCredential.chromeUserData, 'base64'));
   }
 
+
+
+  /**
+   * @description: Converts location where chromium is executing and files contained therein to a buffer. Used inside importCredential() for details.
+   * @returns string
+   * @memberof PuppeteerBot
+   */
   async getChromeUserData() {
     assert(this.userDataDir, 'userDataDir is empty');
 
@@ -1455,6 +1621,12 @@ class PuppeteerBot {
     }
   }
 
+
+  /**
+   * @description: Exports a string (base-64 encoded) containing all cookies and chromium prefs/file structure.
+   * @returns
+   * @memberof PuppeteerBot
+   */
   async exportCredential() {
     assert(this.page, 'page is empty');
 
