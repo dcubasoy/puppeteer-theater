@@ -1,7 +1,7 @@
 
 ##  Purpose & Inspiration
 
-Theater intends to provide an elegant, powerful web-automation / bot operation framework on top of puppeteer that makes complex and messy automation workflows more maintainable and readable than ever before.
+Theater: a one of a kind bot-development platform 
 
 Tested & Fully Compatible with both puppeteer@1.15.0 & puppeteer-firefox@0.5.0.
 
@@ -563,6 +563,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLT
-E5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbLTYyMjUyNTg4MywtMTg5MDIxMTgxNiwtMT
+E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
