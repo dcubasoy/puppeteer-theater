@@ -3,7 +3,7 @@
 
 Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Theater makes your complex, difficult (common reasons: there is bot detection in place, it only works some of the time, how to keep consistent and detailed logs, ad infinitum) challenges in web-scraping/automation much easier.
 
-In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this b
+In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration- there's more!). A show might describe an entire site, like "Capital One". Within this show, your scenes play. So 
 
 Tested & Fully Compatible with both puppeteer@1.15.0 & puppeteer-firefox@0.5.0.
 
@@ -565,6 +565,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQ0Nzg0MTM1NSwtMTg5MDIxMTgxNiwtMT
-E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
+eyJoaXN0b3J5IjpbLTEyNzE2MzAwNTQsLTE4OTAyMTE4MTYsLT
+ExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
