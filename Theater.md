@@ -7,7 +7,7 @@ In a sentence, Theater automates anything and everything a human being is capabl
 
 Imagine: never having to call `waitForNavigation().`Theater is matching scenes with the screen (literally), consequently, it doesn't require any such calls. 
 
-Tested & Fully Compatible with both puppeteer@1.15.0 & puppeteer-firefox@0.5.0.
+Tested & Fully Compatible with both puppeteer@1.16.0 & puppeteer-firefox@0.5.0.
 
 #  Base Classes
 
