@@ -561,19 +561,17 @@ You can find some real-examples of this in the `classes/theater/shows` folder.
 
 ## Test Driven Development
 
-These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page  and add a test assertion in `show-tests/example` folder where `example` is your Show name. I'm looking to improve the way I'm currently handling the test setup & tear down with puppeteer.
+These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page and add a test assertion in `show-tests/example` folder where `example` is your Show name. I'm looking to improve the way I'm currently handling the test setup & tear down with puppeteer. In conclusion, this project is in its infancy but it holds a great deal of promise for those immersed in web automation and scraping. I welcome any and all criticism or comments and will be contributing reguarly.
 
-## Contributing
+## Contributing "rules"
 This is my first real open-source project that I'll be maintaining, I'd love contributions, questions, criticism, or guidance!
 
 ## Contact
-http://nicomee.com
-
-nico@nicomee.com
+nicokokonas@mindwise.io
 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbODAyODkyNzEyLC0xNzA4ODg5NjY1LC0xOD
-kwMjExODE2LC0xMTU3NjAzNzI0LC0xOTEwNzIwNDJdfQ==
+eyJoaXN0b3J5IjpbLTUzMjgwODQ0OSwtMTcwODg4OTY2NSwtMT
+g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
