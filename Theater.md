@@ -56,7 +56,7 @@ await bot.deinit();
 
 - `timeout` <[number]> Time for `Show` to give up matching `Scene` (ms). Defaults to 30000. 
 
-I am working on a method to improve 
+I am working on a method to improve the timeout feature using a CDP feature that can determine if a given request is driving the page's navigation, in which case the show should not end.
 
 
 
@@ -572,6 +572,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTUzOTEwMDIwMiwtMTcwODg4OTY2NSwtMT
+eyJoaXN0b3J5IjpbMTYwODU5OTg3NCwtMTcwODg4OTY2NSwtMT
 g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
