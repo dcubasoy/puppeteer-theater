@@ -37,10 +37,10 @@ bot.page.goto('https://portal.discover.com/customersvcs/universalLogin/ac_main')
 const show = new DiscoShow({
       Scenes: DiscoShow.SceneSets.SignIn,
       bot,
-      logger,
+      logger, // optional, for custom logger instance
 });
 
-show.on('accountLinkedResult', async (o) => { await reporter.onAccountLinkedResult(o); }); // will emit when a sign-in succeeds
+show.on('accountLinkedResult', async (o) => { await reporter.onAccountLinkedResult(o); }); // will emit when sign in succeeds
 
 await show.play();
 
@@ -570,6 +570,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTIzMjk5MzEyLC0xNzA4ODg5NjY1LC0xOD
-kwMjExODE2LC0xMTU3NjAzNzI0LC0xOTEwNzIwNDJdfQ==
+eyJoaXN0b3J5IjpbMjAyOTQ4MTQ0MSwtMTcwODg4OTY2NSwtMT
+g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
