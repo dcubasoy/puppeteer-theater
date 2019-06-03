@@ -476,7 +476,7 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
 
 ###  new Scene.Extension.PreventCurtainFall({ playCount = 1 })
 
-- `playCount` <[number]> curtain will not fall until this extension played for `playCount` times. If not specified, playCount will default to `1`.
+- `playCount` <[number]> curtain will not fall until this extension played for `playCount` times. If not specified, playCount will default to `1`. This extension is really just a stop-gap for developmen
 
 ##  class: Scene.Extensions.Captcha
 
@@ -572,6 +572,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTYwODU5OTg3NCwtMTcwODg4OTY2NSwtMT
+eyJoaXN0b3J5IjpbLTM5NjUzNjQ1OCwtMTcwODg4OTY2NSwtMT
 g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
