@@ -3,13 +3,14 @@
 
 Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Theater makes your complex, difficult (common reasons: there is bot detection in place, it only works some of the time, how to keep consistent and detailed logs, having to constantly wait for a navigation promise, ...ad infinitum) challenges in web-scraping/automation much easier.
 
-In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration- there's more!). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.
+In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.
 
-Normally, when working with puppeteer, you will find yourself repeatedly calling-  `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when suchTheater is matching scenes with the screen (literally), and consequently, it doesn't require any such calls. This is the principal dilemna theater solves. 
+Normally, when working with puppeteer, you will find yourself repeatedly calling-  `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met? 
+This is the principal dilemna theater solves and by extension makes developing puppeteer scripts much easier and more powerful.
 
 Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
 
- Huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain
+ **Huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain**
 
 # # Base Classes
 
@@ -570,6 +571,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwODMyOTAwMzMsLTE3MDg4ODk2NjUsMj
-A5NTEzMzU3Ml19
+eyJoaXN0b3J5IjpbNzA4OTI5MTIsLTE3MDg4ODk2NjUsMjA5NT
+EzMzU3Ml19
 -->
