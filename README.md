@@ -536,9 +536,11 @@ async match() {
   }
 ```
 
-- `Interaction`:  At some point you may find yourself needing to provide some information a bot after it has already begun running (a). Perhaps you need to prompt for a security question's answer, code, etc. Interaction is a very simple class that uses `Redis` to maintain a real-time interaction link between the user and the bot.
+- `Interaction`:  At some point you may find yourself needing to provide some information a bot after it has already begun running (anytime you require input after the bot initializes). Perhaps you need to prompt for a security question's answer, code, etc. Interaction is a very simple class that uses `Redis` to maintain a real-time interaction link between the user and the bot.
+-
+Credits to @vhain, who wrote this code.
 
-I have written a basic React boilerplate that demonstrates how this works (see `classes/theater/shows/jokerstash`) for an example of interaction being used to communicate with a user.
+You will find a basic React boilerplate that demonstrates how this works (see `classes/theater/shows/jokerstash`) for an example of interaction being used to communicate with a user to search for their information. 
 
 
 ## Common Design Patterns
@@ -572,6 +574,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE2MjYwNjIyNjUsLTE3MDg4ODk2NjUsMj
-A5NTEzMzU3Ml19
+eyJoaXN0b3J5IjpbODAyODkyNzEyLC0xNzA4ODg5NjY1LDIwOT
+UxMzM1NzJdfQ==
 -->
