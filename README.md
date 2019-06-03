@@ -50,11 +50,13 @@ await bot.deinit();
 
 ###  new Show({ Scenes, bot, timeout })
 
-- `Scenes` <?[Array]<[Class]<[Scene]>>> An array of type `Scene` that might play. `SceneSets` (as in basic example) can represent a particular workflow, like Sign In.
+- `Scenes` <?[Array]<[Class]<[Scene]>>> An array of type `Scene` that might play. `SceneSets` (a basic example) can represent a particular workflow, like Sign In or Extract Reports.
 
-- `bot` <[PuppeteerBot]> A bot that show will play on.
+- `bot` <[PuppeteerBot]> A bot that show will play on. Wrapper on top of puppeteer. Goal is to remove this dependency soon.
 
-- `timeout` <[number]> Time for `Show` to give up matching `Scene` (ms). Defaults to 30000.
+- `timeout` <[number]> Time for `Show` to give up matching `Scene` (ms). Defaults to 30000. 
+
+I am working on a method to improve the timeout feature using th
 
 
 
@@ -570,6 +572,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjAyOTQ4MTQ0MSwtMTcwODg4OTY2NSwyMD
+eyJoaXN0b3J5IjpbMTEwODczMzQ0MiwtMTcwODg4OTY2NSwyMD
 k1MTMzNTcyXX0=
 -->
