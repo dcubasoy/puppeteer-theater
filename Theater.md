@@ -13,7 +13,8 @@ Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
  **Huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain**
  [Puppeteer docs] (https://pptr.dev/)
 
-There is a lot of work to be done in terms of improving the matching process and contributions are welcome. This project is i
+There is a lot of work to be done in terms of improving the matching process and contributions are welcome. This project is immature and should not be regarded as something to be used in a production environment without careful consideration.
+
 # # Base Classes
 
 ## class: Show
@@ -21,10 +22,7 @@ There is a lot of work to be done in terms of improving the matching process and
 
 * extends: [`EventEmitter`](https://nodejs.org/api/events.html#events_class_eventsemitter)
 
-
-
-Example (Basic) Usage
-- Bot will login to Discover.com
+Example (Bot will login to discover.com)
 
  ```js
 class DiscoverShow extends Show {}
@@ -32,10 +30,9 @@ DiscoverShow.Scenes = Show.scenes(path.join(__dirname, 'discover/'));
 
 const bot = new PuppeteerBot2a({
     preferNonHeadless: true,
-    disguiseFlags: ['-canvas'],
 });
-await bot.init();
-bot.page.goto('https://portal.discover.com/customersvcs/universalLogin/ac_main');
+await bot.init(); // starts the browser 
+bot.page.goto('https://portal.discover.com/customersvcs/universalLogin/ac_main'); // navigates to our page
 
 const show = new DiscoShow({
       Scenes: DiscoShow.SceneSets.SignIn,
@@ -573,6 +570,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExMzI4NDIzOTEsLTE3MDg4ODk2NjUsLT
-E4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbMTIzMjk5MzEyLC0xNzA4ODg5NjY1LC0xOD
+kwMjExODE2LC0xMTU3NjAzNzI0LC0xOTEwNzIwNDJdfQ==
 -->
