@@ -7,13 +7,13 @@ In a sentence, Theater automates anything and everything a human being is capabl
 
 Imagine: never having to call `waitForNavigation().`Theater is matching scenes with the screen (literally), consequently, it doesn't require any such calls.
 
-Tested & Fully Compatible with both puppeteer@1.15.0 & puppeteer-firefox@0.5.0.
+Tested & Fully Compatible with both puppeteer@1.1.0 & puppeteer-firefox@0.5.0.
 
-A huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain
+ huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain
 
-#  Base Classes
+# # Base Classes
 
-##  class: Show
+## class: Show
 
 
 * extends: [`EventEmitter`](https://nodejs.org/api/events.html#events_class_eventsemitter)
@@ -570,5 +570,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE3MDg4ODk2NjUsMjA5NTEzMzU3Ml19
+eyJoaXN0b3J5IjpbLTE4NzcyNjg1MSwtMTcwODg4OTY2NSwyMD
+k1MTMzNTcyXX0=
 -->
