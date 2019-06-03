@@ -1,30 +1,28 @@
+const AWS = require('aws-sdk');
+const shortid = require('shortid');
 const assert = require('assert');
 const util = require('util');
-const shortid = require('shortid');
-const Storage = require('@google-cloud/storage');
-
 const Show = require('./theater/show');
 
-const gcs = Storage();
+const s3 = new AWS.S3();
 
-class TheaterLogFirebaseReporter {
+class TheaterLogS3Reporter {
   constructor({
     show,
     bot,
-    userId,
-    bucket = 'puppeteer-bot-logs',
+    bucket = 'theater-logs',
+    logger,
   }) {
     assert(show instanceof Show, 'emitter is not instance of Show');
 
     this.startedAt = new Date();
     this.show = show;
     this.bot = bot;
-
-    this.userId = userId || shortid.generate();
+    this.userId = userId || shortid.v4();
     this.incrValue = 0;
-    this.bucket = gcs.bucket(bucket);
-    // eslint-disable-next-line no-console
+    this.bucket = bucket;
     this.logger = logger || console.log.bind(console);
+    this.userId = uuid.v4();
 
     this.botTasksCount = 0;
     this.botFreeResolves = [];
@@ -38,29 +36,25 @@ class TheaterLogFirebaseReporter {
     return `${Date.now()}-${v}`;
   }
 
-  gcsKey(filename) {
+  s3Key(filename) {
     return [
+      process.env.NODE_ENV === 'production' ? 'prod' : 'dev',
       this.userId,
-      `${this.show.constructor.name}-${this.show.ref}`,
+      `${this.startedAt.toISOString()}|${this.show.constructor.name}|${this.show.ref}`,
       filename,
     ].join('/');
   }
 
-  async gcsUpload(ContentType, filename, Body) {
+  async upload(ContentType, filename, Body) {
     try {
-      const options = {
-        destination: filename,
-        metadata: {
-          contentType: ContentType,
-        },
-        public: false,
-      };
-
-      const dest = this.gcsKey(filename);
-      const file = this.bucket.file(dest);
-      await file.save(Body, options);
+      await s3.upload({
+        Body,
+        Bucket: this.bucket,
+        ContentType,
+        Key: this.s3Key(filename),
+      }).promise();
     } catch (error) {
-      this.logger.error('gcsUpload', { error });
+      this.logger.error('s3Upload', { error });
     }
   }
 
@@ -88,8 +82,8 @@ class TheaterLogFirebaseReporter {
       this.retainBotTask();
       const screenshot = await this.bot.page.screenshot();
       this.lastScreenshot = screenshot;
-      this.gcsUpload('text/html', `${prefix}-page.html`, await this.bot.page.content());
-      this.gcsUpload('image/png', `${prefix}-page.png`, screenshot);
+      this.upload('text/html', `${prefix}-page.html`, await this.bot.page.content());
+      this.upload('image/png', `${prefix}-page.png`, screenshot);
     } catch (error) {
       this.logger.error('botDump', { error });
     } finally {
@@ -98,26 +92,26 @@ class TheaterLogFirebaseReporter {
   }
 
   onShowStartPlay(o) {
-    this.gcsUpload('text/plain', `${this.incr()}-show-start-play.txt`, util.inspect(o, { depth: null, maxArrayLength: null, breakLength: 0 }));
+    this.upload('text/plain', `${this.incr()}-show-start-play.txt`, util.inspect(o, { depth: null, maxArrayLength: null, breakLength: 0 }));
   }
 
   onShowEndPlay(o) {
     const prefix = `${this.incr()}-show`;
-    this.gcsUpload('text/plain', `${prefix}-end-play.txt`, util.inspect(o, { depth: null, maxArrayLength: null, breakLength: 0 }));
+    this.upload('text/plain', `${prefix}-end-play.txt`, util.inspect(o, { depth: null, maxArrayLength: null, breakLength: 0 }));
     this.botDump(prefix);
   }
 
   onSceneStartPlay(o) {
     const prefix = `${this.incr()}-scene-${o.SceneName}`;
-    this.gcsUpload('text/plain', `${prefix}-start-play.txt`, util.inspect(o, { depth: null, maxArrayLength: null, breakLength: 0 }));
+    this.upload('text/plain', `${prefix}-start-play.txt`, util.inspect(o, { depth: null, maxArrayLength: null, breakLength: 0 }));
     this.botDump(prefix);
   }
 
   onSceneEndPlay(o) {
     const prefix = `${this.incr()}-scene-${o.SceneName}`;
-    this.gcsUpload('text/plain', `${prefix}-end-play.txt`, util.inspect(o, { depth: null, maxArrayLength: null, breakLength: 0 }));
+    this.upload('text/plain', `${prefix}-end-play.txt`, util.inspect(o, { depth: null, maxArrayLength: null, breakLength: 0 }));
     this.botDump(prefix);
   }
 }
 
-module.exports = TheaterLogFirebaseReporter;
+module.exports = TheaterLogS3Reporter;

@@ -16,21 +16,17 @@ const assert = require('assert');
 const uuid = require('uuid');
 const crypto = require('crypto');
 const os = require('os');
-const brotliDecompress = require('brotli');
+const brotliDecompress = require('brotli/decompress');
 const debugConsole = require('debug')('puppeteer-bot-1:console');
 const debug = require('debug')('puppeteer-bot');
 const _ = require('lodash');
 const shortid = require('shortid');
 const AWS = require('aws-sdk');
 const UserAgent = require('user-agents');
-const Storage = require('@google-cloud/storage');
 const geoip = require('geoip-lite');
-const { spawn } = require('child_process');
 
 const s3 = new AWS.S3();
-const gcs = Storage();
 const redis = new Redis(process.env.LOCAL_REDIS_URI || undefined);
-
 
 const rp = opt => new Promise((resolve, reject) => request(opt, (err, resp, body) => {
   if (err) return reject(err);
@@ -970,41 +966,6 @@ class PuppeteerBot {
   /**
    * Optional utilities to upload screenshots and page content to S3 and Google Cloud.
    */
-  async captureToFirebase(name) {
-    if (!gcs) return null;
-    try {
-      await Promise.all([
-        (async () => this.uploadToFirebase('text/html', `${name}-${Date.now()}.html`, await this.page.content()))(),
-        (async () => this.uploadToFirebase('image/png', `${Date.now()}-${name}.png`, await this.page.screenshot()))(),
-      ]);
-    } catch (error) {
-      this.logger.error('error-captureToFirebase', {
-        error,
-      });
-    }
-  }
-
-  async uploadToFirebase(ContentType, filename, Body) {
-    if (!gcs) return null;
-    try {
-      const bucket = gcs.bucket('puppeteer-bot-dump');
-      const dest = `${this.botId}/${filename}`;
-      const options = {
-        destination: dest,
-        metadata: {
-          contentType: ContentType,
-        },
-        public: true,
-      };
-      const file = bucket.file(dest);
-      await file.save(Body, options);
-    } catch (error) {
-      this.logger.error('firebaseUpload', {
-        error,
-      });
-    }
-  }
-
   async captureToS3(name) {
     if (!s3) return null;
     try {

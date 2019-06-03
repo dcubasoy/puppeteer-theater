@@ -80,7 +80,7 @@ class Form extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        userId: localStorage.getItem('userId'),
+        profileId: localStorage.getItem('profileId'),
         begun: false,
       };
     }
@@ -112,8 +112,8 @@ class Form extends React.Component {
           return false;
         }
 
-        if (body.userId) {
-          localStorage.setItem('userId', body.userId);
+        if (body.profileId) {
+          localStorage.setItem('profileId', body.profileId);
         }
 
         this.setState({
@@ -121,7 +121,7 @@ class Form extends React.Component {
           tags: json.tags || {},
           error: json.error,
           session: json.session || {},
-          spec: JSON.stringify({ userId: json.userId, session: json.session }),
+          spec: JSON.stringify({ profileId: json.profileId, session: json.session }),
         });
 
         console.log(json);
@@ -147,19 +147,19 @@ class Form extends React.Component {
       this.setState({ begun: true });
 
       const session = JSON.parse(this.state.userInputSession || '{}');
-      this.fetch(Object.assign({ userId: this.state.userId }, session));
+      this.fetch(Object.assign({ profileId: this.state.profileId }, session));
     }
 
     handleSubmit(values) {
       Object.assign(values);
-      this.fetch({ reply: values, sessId: this.state.sessId, userId: this.state.userId });
+      this.fetch({ reply: values, sessId: this.state.sessId, profileId: this.state.profileId });
     }
 
     render() {
       return (
         <div className='container'>
           <div className="header clearfsix">
-            <h3 className="text-muted">{`${(window.bot || 'chase-signin-0')} bot poc`}</h3>
+            <h3 className="text-muted">{`${(window.bot)} bot`}</h3>
           </div>
 
           <h4>Configurations</h4>
