@@ -6,11 +6,12 @@ Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Th
 In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.
 
 Normally, when working with puppeteer, you will find yourself repeatedly calling-  `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met? 
-This is the principal dilemna theater solves and by extension makes developing puppeteer scripts much easier and more powerful.
+This is the principal dilemna theater solves and by extension makes developing puppeteer scripts much easier and more powerful. Theater allows developers to specify exact conditions visually apparent in the DOM (or not) and execute a particular puppeteer workflow as a result. 
 
 Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
 
  **Huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain**
+ 
 
 # # Base Classes
 
@@ -571,6 +572,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzA4OTI5MTIsLTE3MDg4ODk2NjUsMjA5NT
-EzMzU3Ml19
+eyJoaXN0b3J5IjpbLTM5MDc1NDUwMSwtMTcwODg4OTY2NSwyMD
+k1MTMzNTcyXX0=
 -->
