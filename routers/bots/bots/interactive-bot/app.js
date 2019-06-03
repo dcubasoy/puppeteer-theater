@@ -73,16 +73,16 @@ class Form extends React.Component {
         </form>
       );
     }
-  }
+}
 
-  class App extends React.Component {
+// For supporting interactive bots that can communicate whilst executing
+class App extends React.Component {
     constructor(props) {
       super(props);
 
       this.state = {
-        userId: localStorage.getItem('userId'),
+        id: localStorage.getItem('id'),
         begun: false,
-        vaultProxy: undefined,
       };
     }
 
@@ -110,8 +110,8 @@ class Form extends React.Component {
           return false;
         }
 
-        if (body.userId) {
-          localStorage.setItem('userId', body.userId);
+        if (body.id) {
+          localStorage.setItem('id', body.id);
         }
 
         this.setState({
@@ -119,7 +119,7 @@ class Form extends React.Component {
           tags: json.tags,
           error: json.error,
           session: json.session,
-          spec: JSON.stringify({ userId: json.userId, retailerUserId: json.retailerUserId, session: json.session }),
+          spec: JSON.stringify({ id: json.id, session: json.session }),
         });
 
         console.log(json);
@@ -142,20 +142,20 @@ class Form extends React.Component {
         return false;
       }
 
-      if (!this.state.userId) {
-        alert('Required field "User ID" is empty.');
+      if (!this.state.id) {
+        alert('Required field "id" is empty.');
         return false;
       }
 
       this.setState({ begun: true });
 
       const session = JSON.parse(this.state.userInputSession || '{}');
-      this.fetch(Object.assign({ interactive: true, userId: this.state.userId, vaultProxy: this.state.vaultProxy }, session));
+      this.fetch(Object.assign({ interactive: true, id: this.state.id }, session));
     }
 
     handleSubmit(values) {
       Object.assign(values);
-      this.fetch({ reply: values, sessId: this.state.sessId, userId: this.state.userId });
+      this.fetch({ reply: values, sessId: this.state.sessId, id: this.state.id });
       this.setState({ tags: null, error: null });
     }
 
@@ -163,21 +163,15 @@ class Form extends React.Component {
       return (
         <div className='container'>
           <div className="header clearfix">
-            <h3 className="text-muted">{`${(window.bot || 'chase-signin-0')} bot poc`}</h3>
+            <h3 className="text-muted">{`${(window.bot)} bot poc`}</h3>
           </div>
 
-          <h4>Configurations</h4>
+          <h4>Bot Configurations</h4>
           <form className="form-horizontal">
             <div className="form-group">
-              <label htmlFor="inputUserId" className="col-sm-2 control-label">UID</label>
+              <label htmlFor="inputid" className="col-sm-2 control-label">ID</label>
               <div className="col-sm-10">
-                <input value={this.state.userId} disabled={this.state.begun ? 'disabled': undefined} type="text" className="form-control" id="inputUserId" placeholder="User ID" onChange={e => this.setState({ userId: e.target.value })} />
-              </div>
-            </div>
-            <div className="form-group">
-              <label htmlFor="inputVaultProxy" className="col-sm-2 control-label">session</label>
-              <div className="col-sm-10">
-                <input value={this.state.userInputSession} disabled={this.state.begun ? 'disabled': undefined} type="text" className="form-control" id="inputSession" placeholder="session" onChange={e => this.setState({ userInputSession: e.target.value })} />
+                <input value={this.state.id} disabled={this.state.begun ? 'disabled': undefined} type="text" className="form-control" id="inputid" placeholder="id" onChange={e => this.setState({ id: e.target.value })} />
               </div>
             </div>
             <div className="form-group">
@@ -196,9 +190,9 @@ class Form extends React.Component {
         </div>
       );
     }
-  }
+}
 
   ReactDOM.render(
-    <App />,
+    <App/>,
     document.getElementById('root')
   );

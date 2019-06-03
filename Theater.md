@@ -3,20 +3,20 @@
 
 Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Theater makes your complex, difficult (common reasons: there is bot detection in place, it only works some of the time, how to keep consistent and detailed logs, having to constantly wait for a navigation promise, ...ad infinitum) challenges in web-scraping/automation much easier.
 
-In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration- there's more!). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.  
+In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration- there's more!). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.
 
-Imagine: never having to call `waitForNavigation().`Theater is matching scenes with the screen (literally), consequently, it doesn't require any such calls. 
+Imagine: never having to call `waitForNavigation().`Theater is matching scenes with the screen (literally), consequently, it doesn't require any such calls.
 
 Tested & Fully Compatible with both puppeteer@1.16.0 & puppeteer-firefox@0.5.0.
 
-#  Base Classes
+# Base Classes
 
-##  class: Show
+## class: Show
 
 
 * extends: [`EventEmitter`](https://nodejs.org/api/events.html#events_class_eventsemitter)
 
-  
+
 
 Example (Basic) Usage
 - Bot will login to Discover.com
@@ -44,7 +44,7 @@ await show.play();
 
 await bot.deinit();
 ```
-  
+
 
 ###  new Show({ Scenes, bot, timeout })
 
@@ -54,7 +54,7 @@ await bot.deinit();
 
 - `timeout` <[number]> Time for `Show` to give up matching `Scene` (ms). Defaults to 30000.
 
-  
+
 
 ###  Show.scenes(dir)
 
@@ -64,7 +64,7 @@ await bot.deinit();
 
 - Enumerate files in `dir`, look for all valid `Scene` files and load.
 
-  
+
 
 ###  show.result()
 
@@ -72,26 +72,26 @@ await bot.deinit();
 
 TBD. To return some result.
 
- 
+
 ###  show.scene(TargetScene)
 
 - `TargetScene` <[Class]<[Scene]>>
 
 - returns: <[Promise]<[Scene]>>
 
-  
+
 
 If `TargetScene` specified, returns instance of that `Scene` for this show.
 
 If no `TargetScene` specified, this method will returns matching `Scene`.
 
-  
+
 
 ###  show.play()
 
 - returns: <[Promise]>
 
- 
+
 This method will play the show. Iterating through out all the `Scenes` and `play()`ing those with `match()`es.
 
 ##  class: Scene
@@ -140,17 +140,17 @@ class RequestSessionExtensionScene extends Scene {
 
 - `generic` <[boolean]> If this value sets to `false`, conditions should be specified to determine when curtain will fall (ending the show). Defaults to `true`
 
-  
+
 
 ###  scene.context(key)
 
 - `key` <[string]>
 
-  
+
 
 returns `contextVariable[key]`
 
-  ### scene.interaction() 
+  ### scene.interaction()
   - returns: <[Interaction]>
 
 ###  scene.setContext(key, value)
@@ -160,13 +160,13 @@ returns `contextVariable[key]`
 - `value` <[\*]>
 - sets `var[key] = value`
 
-  
+
 
 ###  scene.match()
 
 - returns: <[Promise]<[boolean]>>
 
-  
+
 Criterion for determining whether this `scene` will match (returning `true`) in order:
 
 - Curtain has **NOT** fallen yet
@@ -175,35 +175,35 @@ Criterion for determining whether this `scene` will match (returning `true`) in 
 
 - `extensions[].match()` all have returned `true`
 
-  
+
 
 ####  scene.curtainFallen()
 
 - returns: <[Promise]<[boolean]>>
 
-  
+
 
 Check if `scene` finished playing; curtain fallen:
 
 - Not `generic` and no `extensions[].curtainFallen()` present in this scene.
 
-  
+
 
 ####  scene.play()
 
 - returns: <[Promise]>
 
-  
+
 
 By default, this method will only call `extensions[].play()`.
 
-  
-  
-  
+
+
+
 
 ##  class: PuppeteerBotElement
 
-  
+
 
 **elementQueries**: A series of selectors and conditionals that describe the state of the page that corresponds to the scene in which they lie.
 
@@ -216,11 +216,11 @@ query = {
 }
 ```
 
-  
+
 
 This object (**elementQueries**) will be unique to a particular scene, when the scene is constructed it will target the results and map them into PuppeteerBotElement(s).
 
-  
+
 
 - If `visibility` is `'required'`, element will only match if that target element is visible. (Default)
 
@@ -296,14 +296,14 @@ This object (**elementQueries**) will be unique to a particular scene, when the 
 - returns a screenshot of the `first` element matching given elementQuery for given `PupeeteerBotElement`.
 - returns: <[Promise]<[Buffer]>> with screenshot file contents.
 
-####  element.upload(file, opt  = {}) 
+####  element.upload(file, opt  = {})
 
 - Writes file to temporary directory on disk, uploads file on given elements inside this PuppeteerBotElement, cleans up.
 - returns: <[Promise]<[boolean]>> whether file uploaded or not.
 
 ####  element.tableContent()
 
-- returns table as an array of JSON objects (`good` for scraping) 
+- returns table as an array of JSON objects (`good` for scraping)
 - returns: <[Promise]<[Array]<Object>]>>
 
 ####  element.eval(fn, ...args)
@@ -313,7 +313,7 @@ Convenience function to run `puppeteerBot.$$safeEval`. First argument of `fn` wi
 
 ## Example Scene (1):
 
-  
+
 ```js
 /**
  * Scene will play IFF:
@@ -416,7 +416,7 @@ class TestScene2 extends Scene {
 ```
 
 
-  
+
 # Scene.Extensions
 
 ## class: Scene.Extensions.Click
@@ -431,7 +431,7 @@ class TestScene2 extends Scene {
 
 -  `ms`  <[number]>  Giving a delay for  `ms` (ms). If `ms` left empty, value will be a random `number` between 2000-7500.
 
-  
+
 ##  class: Scene.Extensions.Fork
 
 ### new  Scene.Extensions.Fork(forks)
@@ -466,7 +466,7 @@ Use this extension if `Scene` can be forked into multiple options. If a given `S
 
 However, if  all `Scene`s' curtain have fallen (show is over), this extension's curtain will also fall.
 
-  
+
 
 ##  class: Scene.Extensions.PreventCurtainFall
 
@@ -487,7 +487,7 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
 - `targetElementName` is element name wherein `#g-recaptcha-response` is contained in child nodes of this element. Most often seen as `.g-recaptcha`. This extension will determine site-key from provided `siteKeyFn()`, solve recaptcha, use `getFrame()` if needed to properly set response, and invoke the  callback function (if present) to trigger the result after captcha has been solved.
 
 ## Components
-Some of the syntax within Theater can seem intimidating but it is pretty simple once you understand the underlying components. 
+Some of the syntax within Theater can seem intimidating but it is pretty simple once you understand the underlying components.
 
 - `promise-condition`: supports `or`, `and`, `not`, `strictEqual` nested evaluations for promises. Extremely useful, as illustrated in two examples.
 
@@ -499,14 +499,14 @@ Here the scene will `match()` when either challenge or header is `visible()`. Ot
       this.elements.header.visible(),
     );
   }
-  
+
 async match() {
     return PromiseCondition.and(
 	  super.match(), // now the first is no longer needed
   }
 ```
 
-Here the scene will `match()` when all puppeteer-bot-element queries have validated, and context `signedIn` has been set to `true`.  
+Here the scene will `match()` when all puppeteer-bot-element queries have validated, and context `signedIn` has been set to `true`.
 ```js
   async match() {
     return PromiseCondition.and(
@@ -532,22 +532,22 @@ async match() {
   }
 ```
 
-- `Interaction`:  At some point you may find yourself needing to provide some information a bot after it has already begun running (a good use-case: linking an account to your app). Perhaps you need to prompt for a security question's answer, code, etc. Interaction is a very simple class that uses `Redis` to maintain a real-time interaction link between the user and the bot. 
+- `Interaction`:  At some point you may find yourself needing to provide some information a bot after it has already begun running (a good use-case: linking an account to your app). Perhaps you need to prompt for a security question's answer, code, etc. Interaction is a very simple class that uses `Redis` to maintain a real-time interaction link between the user and the bot.
 
 I have written a basic React boilerplate that demonstrates how this works (see `classes/theater/shows/jokerstash`) for an example of interaction being used to communicate with a user.
 
 
 ## Common Design Patterns
 
-When working with complex automation tasks, I've found setting up a few boilerplate Scenes before I do anything else saves me a lot of time. 
-These scenes are: 
+When working with complex automation tasks, I've found setting up a few boilerplate Scenes before I do anything else saves me a lot of time.
+These scenes are:
 
  - JustClickAwareScene (exports `JustClickAwareScene.WithSpinner`,
    `JustClickAwareScene.WithoutSpinner `
-   
+
  - JustClickScene: will just-click any selector specified - perfect for
    closing annoying modals, CTAs, extending session, etc
-   
+
  - SpinnerAwareScene: (will wait for any spinners/loading modals to
    dissapear before continuing to`play()` the Show.
 

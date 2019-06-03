@@ -12,6 +12,9 @@ const BOTS = (() => fs.readdirSync(path.join(__dirname, './bots'))
   .reduce((p, c) => { p[c.name] = c; return p; }, {}))();
 
 
+  /**
+   * basic boilerplate for running bots in browser
+   */
 router.get('/run', async (req, res, next) => {
   try {
     let html = `<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script><script>
