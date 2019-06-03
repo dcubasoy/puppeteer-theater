@@ -569,10 +569,10 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 ## Contact
 nicokokonas@mindwise.io
 
-
+[https://webscrapers.slack.com](https://webscrapers.slack.com/) for a prompt response, message me here!
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTEwNTc3NDQ0NSwtMTcwODg4OTY2NSwyMD
+eyJoaXN0b3J5IjpbMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwyMD
 k1MTMzNTcyXX0=
 -->
