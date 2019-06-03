@@ -3,25 +3,26 @@
 
 Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Theater makes your complex, difficult (common reasons: there is bot detection in place, it only works some of the time, how to keep consistent and detailed logs, having to constantly wait for a navigation promise, ...ad infinitum) challenges in web-scraping/automation much easier.
 
-In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration- there's more!). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.
+In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.
 
-Imagine: never having to call `waitForNavigation().`Theater is matching scenes with the screen (literally), consequently, it doesn't require any such calls.
+Normally, when working with puppeteer, you will find yourself repeatedly calling-  `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met? 
+This is the principal dilemna theater solves and by extension makes developing puppeteer scripts much easier and more powerful. Theater allows developers to specify exact conditions visually apparent in the DOM (or not) and execute a particular puppeteer workflow as a result. 
 
-Tested & Fully Compatible with both puppeteer@1.15.0 & puppeteer-firefox@0.5.0.
+Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
 
-A huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain
+ **Huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain**
+ [Puppeteer docs] (https://pptr.dev/)
 
-#  Base Classes
+There is a lot of work to be done in terms of improving the matching process and contributions are welcome. This project is immature and should not be regarded as something to be used in a production environment without careful consideration.
 
-##  class: Show
+# # Base Classes
+
+## class: Show
 
 
 * extends: [`EventEmitter`](https://nodejs.org/api/events.html#events_class_eventsemitter)
 
-
-
-Example (Basic) Usage
-- Bot will login to Discover.com
+Example (Bot will login to discover.com)
 
  ```js
 class DiscoverShow extends Show {}
@@ -29,18 +30,17 @@ DiscoverShow.Scenes = Show.scenes(path.join(__dirname, 'discover/'));
 
 const bot = new PuppeteerBot2a({
     preferNonHeadless: true,
-    disguiseFlags: ['-canvas'],
 });
-await bot.init();
-bot.page.goto('https://portal.discover.com/customersvcs/universalLogin/ac_main');
+await bot.init(); // starts the browser 
+bot.page.goto('https://portal.discover.com/customersvcs/universalLogin/ac_main'); // navigates to our page
 
 const show = new DiscoShow({
       Scenes: DiscoShow.SceneSets.SignIn,
       bot,
-      logger,
+      logger, // optional, for custom logger instance
 });
 
-show.on('accountLinkedResult', async (o) => { await reporter.onAccountLinkedResult(o); }); // will emit when a sign-in succeeds
+show.on('accountLinkedResult', async (o) => { await reporter.onAccountLinkedResult(o); }); // will emit when sign in succeeds
 
 await show.play();
 
@@ -50,11 +50,13 @@ await bot.deinit();
 
 ###  new Show({ Scenes, bot, timeout })
 
-- `Scenes` <?[Array]<[Class]<[Scene]>>> An array of type `Scene` that might play. `SceneSets` (as in basic example) can represent a particular workflow, like Sign In.
+- `Scenes` <?[Array]<[Class]<[Scene]>>> An array of type `Scene` that might play. `SceneSets` (a basic example) can represent a particular workflow, like Sign In or Extract Reports.
 
-- `bot` <[PuppeteerBot]> A bot that show will play on.
+- `bot` <[PuppeteerBot]> A bot that show will play on. Wrapper on top of puppeteer. Goal is to remove this dependency soon.
 
-- `timeout` <[number]> Time for `Show` to give up matching `Scene` (ms). Defaults to 30000.
+- `timeout` <[number]> Time for `Show` to give up matching `Scene` (ms). Defaults to 30000. 
+
+I am working on a method to improve the timeout feature using a CDP feature that can determine if a given request is driving the page's navigation, in which case the show should not end.
 
 
 
@@ -474,7 +476,7 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
 
 ###  new Scene.Extension.PreventCurtainFall({ playCount = 1 })
 
-- `playCount` <[number]> curtain will not fall until this extension played for `playCount` times. If not specified, playCount will default to `1`.
+- `playCount` <[number]> curtain will not fall until this extension played for `playCount` times. If not specified, playCount will default to `1`. This extension is really just a stop-gap for development- as it is sometimes not clear whether or not the bot should continue working. For development, I recommend using it liberally. 
 
 ##  class: Scene.Extensions.Captcha
 
@@ -488,7 +490,7 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
 
 - `targetElementName` is element name wherein `#g-recaptcha-response` is contained in child nodes of this element. Most often seen as `.g-recaptcha`. This extension will determine site-key from provided `siteKeyFn()`, solve recaptcha, use `getFrame()` if needed to properly set response, and invoke the  callback function (if present) to trigger the result after captcha has been solved.
 
-## Components
+## Core Components
 Some of the syntax within Theater can seem intimidating but it is pretty simple once you understand the underlying components.
 
 - `promise-condition`: supports `or`, `and`, `not`, `strictEqual` nested evaluations for promises. Extremely useful, as illustrated in two examples.
@@ -534,9 +536,11 @@ async match() {
   }
 ```
 
-- `Interaction`:  At some point you may find yourself needing to provide some information a bot after it has already begun running (a good use-case: linking an account to your app). Perhaps you need to prompt for a security question's answer, code, etc. Interaction is a very simple class that uses `Redis` to maintain a real-time interaction link between the user and the bot.
+- `Interaction`:  At some point you may find yourself needing to provide some information a bot after it has already begun running (anytime you require input after the bot initializes). Perhaps you need to prompt for a security question's answer, code, etc. Interaction is a very simple class that uses `Redis` to maintain a real-time interaction link between the user and the bot.
+-
+Credits to @vhain, who wrote this code.
 
-I have written a basic React boilerplate that demonstrates how this works (see `classes/theater/shows/jokerstash`) for an example of interaction being used to communicate with a user.
+You will find a basic React boilerplate that demonstrates how this works (see `classes/theater/shows/jokerstash`) for an example of interaction being used to communicate with a user to search for their information. 
 
 
 ## Common Design Patterns
@@ -557,18 +561,18 @@ You can find some real-examples of this in the `classes/theater/shows` folder.
 
 ## Test Driven Development
 
-These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page  and add a test assertion in `show-tests/example` folder where `example` is your Show name. I'm looking to improve the way I'm currently handling the test setup & tear down with puppeteer.
+These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page and add a test assertion in `show-tests/example` folder where `example` is your Show name. I'm looking to improve the way I'm currently handling the test setup & tear down with puppeteer. In conclusion, this project is in its infancy but it holds a great deal of promise for those immersed in web automation and scraping. I welcome any and all criticism or comments and will be contributing reguarly.
 
-## Contributing
+## Contributing "rules"
 This is my first real open-source project that I'll be maintaining, I'd love contributions, questions, criticism, or guidance!
 
 ## Contact
-http://nicomee.com
+nicokokonas@mindwise.io
 
-nico@nicomee.com
-
+[https://webscrapers.slack.com](https://webscrapers.slack.com/) for a prompt response, message me here!
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE3MDg4ODk2NjUsMjA5NTEzMzU3Ml19
+eyJoaXN0b3J5IjpbMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwyMD
+k1MTMzNTcyXX0=
 -->
