@@ -1,7 +1,11 @@
 
 ##  Purpose & Inspiration
 
-Theater intends to provide an elegant, powerful web-automation / bot operation framework on top of puppeteer that makes complex and messy automation workflows more maintainable and readable than ever before.
+Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Theater makes your complex, difficult (common reasons: there is bot detection in place, it only works some of the time, how to keep consistent and detailed logs, having to constantly wait for a navigation promise, ...ad infinitum) challenges in web-scraping/automation much easier.
+
+In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration- there's more!). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.  
+
+Imagine: never having to call `waitForNavigation().`Theater is matching scenes with the screen (literally), consequently, it doesn't require any such calls. 
 
 Tested & Fully Compatible with both puppeteer@1.15.0 & puppeteer-firefox@0.5.0.
 
@@ -92,7 +96,8 @@ This method will play the show. Iterating through out all the `Scenes` and `play
 
 ##  class: Scene
 
-This example scene will simply click #session_btn_continue. In the first example, 
+This example scene will simply click #session_btn_continue. In the first example using `Scene.Extensions.Click()` and in the second using the basic approach.
+
 ```js
 class ClickExtendScene extends Scene {
   constructor(args) {
@@ -563,6 +568,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLT
-E5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLT
+ExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
