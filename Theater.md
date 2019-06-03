@@ -476,7 +476,7 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
 
 ###  new Scene.Extension.PreventCurtainFall({ playCount = 1 })
 
-- `playCount` <[number]> curtain will not fall until this extension played for `playCount` times. If not specified, playCount will default to `1`. This extension is really just a stop-gap for developmen
+- `playCount` <[number]> curtain will not fall until this extension played for `playCount` times. If not specified, playCount will default to `1`. This extension is really just a stop-gap for development- as it is sometimes not clear whether or not the bot should continue working. For development, I recommend using it liberally. 
 
 ##  class: Scene.Extensions.Captcha
 
@@ -490,7 +490,7 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
 
 - `targetElementName` is element name wherein `#g-recaptcha-response` is contained in child nodes of this element. Most often seen as `.g-recaptcha`. This extension will determine site-key from provided `siteKeyFn()`, solve recaptcha, use `getFrame()` if needed to properly set response, and invoke the  callback function (if present) to trigger the result after captcha has been solved.
 
-## Components
+## Core Components
 Some of the syntax within Theater can seem intimidating but it is pretty simple once you understand the underlying components.
 
 - `promise-condition`: supports `or`, `and`, `not`, `strictEqual` nested evaluations for promises. Extremely useful, as illustrated in two examples.
@@ -536,7 +536,7 @@ async match() {
   }
 ```
 
-- `Interaction`:  At some point you may find yourself needing to provide some information a bot after it has already begun running (a good use-case: linking an account to your app). Perhaps you need to prompt for a security question's answer, code, etc. Interaction is a very simple class that uses `Redis` to maintain a real-time interaction link between the user and the bot.
+- `Interaction`:  At some point you may find yourself needing to provide some information a bot after it has already begun running (a good use). Perhaps you need to prompt for a security question's answer, code, etc. Interaction is a very simple class that uses `Redis` to maintain a real-time interaction link between the user and the bot.
 
 I have written a basic React boilerplate that demonstrates how this works (see `classes/theater/shows/jokerstash`) for an example of interaction being used to communicate with a user.
 
@@ -572,6 +572,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTM5NjUzNjQ1OCwtMTcwODg4OTY2NSwtMT
+eyJoaXN0b3J5IjpbLTY5NzQ3MDUyNSwtMTcwODg4OTY2NSwtMT
 g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
