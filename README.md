@@ -11,8 +11,9 @@ This is the principal dilemna theater solves and by extension makes developing p
 Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
 
  **Huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain**
- 
+ [Puppeteer docs] (https://pptr.dev/)
 
+There is a lot of work to be done in terms of improving the matching process and contributions are welcome. This project is immature and 
 # # Base Classes
 
 ## class: Show
@@ -572,6 +573,6 @@ nico@nicomee.com
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTM5MDc1NDUwMSwtMTcwODg4OTY2NSwyMD
+eyJoaXN0b3J5IjpbLTQ0NzU3MjQyNywtMTcwODg4OTY2NSwyMD
 k1MTMzNTcyXX0=
 -->
