@@ -1,10 +1,6 @@
 const assert = require('assert');
-const debug = require('debug');
-const request = require('request');
-const MailListener = require('mail-listener-next');
 const _ = require('lodash');
-const PromiseCondition = require('../../utils/promise-condition');
-
+const PromiseCondition = require('./promise-condition');
 
 // Simply click all elements
 class Click {
@@ -29,7 +25,7 @@ class Click {
           this.scene.log('Extensions.Click:', 'clicking element', elementNames[i]);
           // eslint-disable-next-line no-await-in-loop
           worked = await element.click();
-          if (worked) break;
+          if (worked && this.once) break;
         }
       }
     }
@@ -171,57 +167,7 @@ class ReCAPTCHAv2 {
   }
 }
 
-
-// Email OTP Interception (using mail-listener)
-class EmailOTP {
-  constructor(targetElementName, IMAPConfig) {
-    this.targetElementName = targetElementName;
-    this.IMAPConfig = IMAPConfig;
-    assert(this.targetElementName, 'targetElementName undefined');
-    assert(this.IMAPConfig, 'IMAPConfig undefined');
-  }
-
-
-  async match() {
-    const element = this.scene.elements[this.targetElementName];
-    if (!await element.visible()) return false;
-    return true;
-  }
-
-  async play() {
-    const element = this.scene.elements[this.targetElementName];
-    this.scene.log('Extensions.EmailOTP:', 'IMAPConfig:', this.IMAPConfig);
-
-    const mailListener = new MailListener(this.IMAPConfig);
-    mailListener.start();
-
-    let code;
-    mailListener.on('mail', async (mail, seqno, attributes) => {
-      const { subject, from } = mail;
-
-      this.log('Email (subject): ', subject);
-      this.log('Email (from): ', from);
-
-      if (subject.includes('Verify your Apple ID email address')) {
-        const { text } = mail;
-        this.log('Found mail text: ', text);
-        // eslint-disable-next-line prefer-destructuring
-        code = text.match(/\d{6}/)[0];
-
-        this.log('Found Code: ', code);
-        await this.scene.setContext('code', code);
-      }
-    });
-
-    mailListener.stop();
-
-    this.scene.log('Extensions.EmailOTP:Code:', 'Code:', code);
-    await element.fill(code);
-  }
-}
-
-
-// GenericP Captcha
+//  Captcha
 class Captcha {
   constructor(targetElementName, targetAnswerElementName) {
     this.targetElementName = targetElementName;
@@ -252,6 +198,7 @@ class Captcha {
   }
 }
 
+
 module.exports = {
   Click,
   Delay,
@@ -259,5 +206,4 @@ module.exports = {
   PreventCurtainFall,
   ReCAPTCHAv2,
   Captcha,
-  EmailOTP,
 };

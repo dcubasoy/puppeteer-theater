@@ -1,4 +1,3 @@
-const ey = require('@nicomee/bt_backend-core');
 const Scene = require('../../scene');
 
 class CreditKarmaValidationFailedScene extends Scene {
@@ -17,7 +16,7 @@ class CreditKarmaValidationFailedScene extends Scene {
   async play() {
     await super.play();
     this.show.emit('creditAccountBotResult', { status: 'NoHitFile' });
-    throw new ey.Error(500, 'NoHitFile');
+    throw new Error('NoHitFile');
   }
 }
 

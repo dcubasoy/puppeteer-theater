@@ -1,4 +1,3 @@
-const ey = require('@nicomee/bt_backend-core');
 const PromiseCondition = require('../../../../utils/promise-condition');
 const CreditKarmaJustClickAwareScene = require('./just-click-aware-scene');
 
@@ -27,7 +26,6 @@ class CreditKarmaExistingMemberScene extends CreditKarmaJustClickAwareScene.With
       status: 'ExistingUser',
       email,
     });
-    throw new ey.Error(500, 'ExistingAccount');
   }
 }
 

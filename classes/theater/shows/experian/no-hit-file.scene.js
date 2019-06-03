@@ -1,4 +1,3 @@
-const ey = require('@nicomee/bt_backend-core');
 const ExperianJustClickSpinnerAwareScene = require('./just-click-aware-scene');
 const PromiseCondition = require('../../../../utils/promise-condition');
 
@@ -24,7 +23,7 @@ class ExperianNoHitCreditFileScene extends ExperianJustClickSpinnerAwareScene.Wi
     this.show.emit('creditAccountBotResult', {
       status: 'NoHitFile',
     });
-    throw new ey.Error(500, 'NoHitFile');
+    throw new Error, 'NoHitFile');
   }
 }
 

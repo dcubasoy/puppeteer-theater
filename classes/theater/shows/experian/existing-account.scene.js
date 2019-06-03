@@ -1,4 +1,3 @@
-const ey = require('@nicomee/bt_backend-core');
 const ExperianJustClickSpinnerAwareScene = require('./just-click-aware-scene');
 const PromiseCondition = require('../../../../utils/promise-condition');
 
@@ -23,7 +22,7 @@ class ExperianExistingAccountScene extends ExperianJustClickSpinnerAwareScene.Wi
 
   async play() {
     await super.play();
-    throw new ey.Error(500, 'ExistingAccount');
+    throw new Error, 'ExistingAccount');
   }
 }
 

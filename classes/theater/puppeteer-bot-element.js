@@ -136,11 +136,22 @@ class PuppeteerBotElement {
     return ((await this.visible()) ^ (this.query.visibility === 'required')) === 0;
   }
 
-  async tableContent() {
+  async tableContent(opts) {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).outerHTML || '').trim(), el)));
     const content = strs.filter(s => !!s).join('\n');
-    return tabletojson.convert(content, { stripHtml: true, stripHtmlFromHeadings: true, stripHtmlFromCells: true });
+
+    let options = { stripHtml: true };
+    if (opts) {
+      Object.assign(options, opts);
+    }
+
+    console.log(options);
+    return tabletojson.convert(content, options);
+  }
+
+  async textContents() {
+    return this.tableContent({ asArray: true });
   }
 
   async textContent({ asArray = false } = {}) {
@@ -150,10 +161,6 @@ class PuppeteerBotElement {
       return strs;
     }
     return strs.filter(s => !!s).join('\n');
-  }
-
-  async textContents() {
-    return this.textContent({ asArray: true });
   }
 
   async innerText({ asArray = false } = {}) {

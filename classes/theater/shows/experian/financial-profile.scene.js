@@ -1,4 +1,3 @@
-const ey = require('@nicomee/bt_backend-core');
 const Scene = require('../../scene');
 const ExperianJustClickSpinnerAwareScene = require('./just-click-aware-scene');
 const PromiseCondition = require('../../../../utils/promise-condition');

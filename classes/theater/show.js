@@ -2,7 +2,6 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events');
-const ey = require('@nicomee/bt_backend-core');
 const debug = require('debug')('theater:show');
 const shortid = require('shortid');
 const util = require('util');
@@ -133,7 +132,7 @@ class Show extends EventEmitter {
         .map(s => s.scene);
       if (matchedScenes.length > 1) {
         debug(`matchedScenes.length > 1: ${matchedScenes.map(s => s.constructor.name).sort()}`);
-        // assert(matchedScenes.length <= 1, `matchedScenes.length > 1: ${matchedScenes.map(s => s.constructor.name).sort()}`);
+        assert(matchedScenes.length <= 1, `matchedScenes.length > 1: ${matchedScenes.map(s => s.constructor.name).sort()}`);
       }
       if (matchedScenes < 1) {
         return null;
@@ -186,7 +185,7 @@ class Show extends EventEmitter {
         if (err) log.error = err;
         this.emit('sceneEndPlay', log);
       }
-      debug('Done Played Scene:', scene.constructor.name, 'with result:', !!log.result);
+      debug('Finished Playing Scene:', scene.constructor.name, '| Result:', !!log.result);
     }
 
     return scene;
@@ -203,7 +202,7 @@ class Show extends EventEmitter {
       for (
         this.lastScenePlayedAt = Date.now(); Date.now() - this.lastScenePlayedAt < this.timeout;
       ) {
-        // debug('play loop');
+        debug('play loop');
 
         // eslint-disable-next-line no-await-in-loop
         const bot = await this.bot();
@@ -230,13 +229,13 @@ class Show extends EventEmitter {
           }
 
           if (scene.continuousPlayLimit() < continuousPlayCount) {
-            throw new Error('timeout-continuous-play-limit-exceeded');
+            throw new Error('timeout-continuous-play-limit-exceeded'); // TODO: improve this
           }
         }
 
         const nonGenericScenes = this.scenes.filter(s => !s.generic);
 
-        // debug('curtain fallen check');
+        debug('curtain fallen check');
         // eslint-disable-next-line no-await-in-loop
         if (await PromiseCondition.and(nonGenericScenes.map(s => s.curtainFallen()))) {
           // eslint-disable-next-line no-await-in-loop
@@ -246,7 +245,7 @@ class Show extends EventEmitter {
         }
       }
 
-      throw new ey.Error(504, 'show-match-timeout');
+      throw new Error(504, 'show-match-timeout');
     } catch (error) {
       globalError = error;
       throw error;
