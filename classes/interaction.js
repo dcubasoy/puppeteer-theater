@@ -47,7 +47,8 @@ module.exports = class Interaction {
     for (let okay = null; !okay;) {
       this.sessId = uuid();
       // eslint-disable-next-line no-await-in-loop
-      logger.silly('generating sessId', await this.logMeta());
+      // eslint-disable-next-line no-console
+      console.log('generating sessId');
       // eslint-disable-next-line no-await-in-loop
       okay = await redis.set(this.redisKey(), 1, 'ex', this.sessionTimeout, 'nx');
     }

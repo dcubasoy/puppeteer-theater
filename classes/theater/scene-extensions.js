@@ -16,7 +16,6 @@ class Click {
   async play() {
     const elementNames = Object.keys(this.scene.elements);
     for (let i = 0; i < elementNames.length; i += 1) {
-
       let worked = false;
       if (!this.only || this.only === elementNames[i]) {
         const element = this.scene.elements[elementNames[i]];
@@ -145,6 +144,7 @@ class ReCAPTCHAv2 {
     // re-release bot
     const bot = await this.scene.show.bot();
 
+    // eslint-disable-next-line max-len
     const websiteKey = element ? await element.eval(this.siteKeyFn) : await bot.page.evaluate(this.siteKeyFn);
     this.scene.log('Extensions.ReCAPTCHAv2:', 'websiteKey:', websiteKey);
 

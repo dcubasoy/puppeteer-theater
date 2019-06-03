@@ -5,7 +5,7 @@ const horoscope = require('horoscope');
 
 const Scene = require('../../scene');
 const ExperianJustClickSpinnerAwareScene = require('./just-click-aware-scene');
-const PromiseCondition = require('../../../../utils/promise-condition');
+const PromiseCondition = require('../../promise-condition');
 const utils = require('../../../../routers/bots/utils');
 
 

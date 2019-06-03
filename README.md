@@ -5,12 +5,12 @@ Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Th
 
 In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.
 
-Normally, when working with puppeteer, you will find yourself repeatedly calling-  `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met? 
-This is the principal dilemna theater solves and by extension makes developing puppeteer scripts much easier and more powerful. Theater allows developers to specify exact conditions visually apparent in the DOM (or not) and execute a particular puppeteer workflow as a result. 
+Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
+This is the principal dilemna theater solves and by extension makes developing puppeteer scripts much easier and more powerful. Theater allows developers to specify exact conditions visually apparent in the DOM (or not) and execute a particular puppeteer workflow as a result.
 
 Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
 
- **Huge shoutout to original creator, mentor and friend, Juwan Yoo. https://github.com/vhain**
+ **Huge shoutout to original creator, mentor and friend, Juwan Yoo. It was an honor working with you. https://github.com/vhain**
  [Puppeteer docs] (https://pptr.dev/)
 
 There is a lot of work to be done in terms of improving the matching process and contributions are welcome. This project is immature and should not be regarded as something to be used in a production environment without careful consideration.
@@ -28,10 +28,10 @@ Example (Bot will login to discover.com)
 class DiscoverShow extends Show {}
 DiscoverShow.Scenes = Show.scenes(path.join(__dirname, 'discover/'));
 
-const bot = new PuppeteerBot2a({
+const bot = new PuppeteerBot({
     preferNonHeadless: true,
 });
-await bot.init(); // starts the browser 
+await bot.init(); // starts the browser
 bot.page.goto('https://portal.discover.com/customersvcs/universalLogin/ac_main'); // navigates to our page
 
 const show = new DiscoShow({
@@ -54,7 +54,7 @@ await bot.deinit();
 
 - `bot` <[PuppeteerBot]> A bot that show will play on. Wrapper on top of puppeteer. Goal is to remove this dependency soon.
 
-- `timeout` <[number]> Time for `Show` to give up matching `Scene` (ms). Defaults to 30000. 
+- `timeout` <[number]> Time for `Show` to give up matching `Scene` (ms). Defaults to 30000.
 
 I am working on a method to improve the timeout feature using a CDP feature that can determine if a given request is driving the page's navigation, in which case the show should not end.
 
@@ -476,7 +476,7 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
 
 ###  new Scene.Extension.PreventCurtainFall({ playCount = 1 })
 
-- `playCount` <[number]> curtain will not fall until this extension played for `playCount` times. If not specified, playCount will default to `1`. This extension is really just a stop-gap for development- as it is sometimes not clear whether or not the bot should continue working. For development, I recommend using it liberally. 
+- `playCount` <[number]> curtain will not fall until this extension played for `playCount` times. If not specified, playCount will default to `1`. This extension is really just a stop-gap for development- as it is sometimes not clear whether or not the bot should continue working. For development, I recommend using it liberally.
 
 ##  class: Scene.Extensions.Captcha
 
@@ -540,7 +540,7 @@ async match() {
 -
 Credits to @vhain, who wrote this code.
 
-You will find a basic React boilerplate that demonstrates how this works (see `classes/theater/shows/jokerstash`) for an example of interaction being used to communicate with a user to search for their information. 
+You will find a basic React boilerplate that demonstrates how this works (see `classes/theater/shows/jokerstash`) for an example of interaction being used to communicate with a user to search for their information.
 
 
 ## Common Design Patterns
@@ -573,6 +573,6 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwyMD
-k1MTMzNTcyXX0=
+eyJoaXN0b3J5IjpbMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMT
+g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->

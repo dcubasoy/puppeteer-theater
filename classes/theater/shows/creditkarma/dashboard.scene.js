@@ -1,4 +1,4 @@
-const PromiseCondition = require('../../../../utils/promise-condition');
+const PromiseCondition = require('../../promise-condition');
 const CreditKarmaSpinnerAwareScene = require('./spinner-aware-scene');
 
 class CreditKarmaDashboardScene extends CreditKarmaSpinnerAwareScene {

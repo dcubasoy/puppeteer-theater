@@ -99,6 +99,7 @@ class Scene {
         await playableExensions[i].play();
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.trace(error);
     }
   }

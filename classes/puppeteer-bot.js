@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-console */
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-await-in-loop */
@@ -14,21 +16,44 @@ const assert = require('assert');
 const uuid = require('uuid');
 const crypto = require('crypto');
 const os = require('os');
-const debugConsole = require('debug')('puppeteer-bot:console');
+const brotliDecompress = require('brotli');
+const debugConsole = require('debug')('puppeteer-bot-1:console');
 const debug = require('debug')('puppeteer-bot');
 const _ = require('lodash');
 const shortid = require('shortid');
+const AWS = require('aws-sdk');
 const UserAgent = require('user-agents');
+const Storage = require('@google-cloud/storage');
 const geoip = require('geoip-lite');
+const { spawn } = require('child_process');
 
+const s3 = new AWS.S3();
+const gcs = Storage();
 const redis = new Redis(process.env.LOCAL_REDIS_URI || undefined);
+
 
 const rp = opt => new Promise((resolve, reject) => request(opt, (err, resp, body) => {
   if (err) return reject(err);
   return resolve([resp, body]);
 }));
-
 const wait = ms => new Promise(r => setTimeout(r, ms));
+
+function uppercaseObjKeys(o) {
+  return Object.keys(o)
+    .map(k => ({
+      startName: k,
+      newName: k.split('-').map(kp => kp.charAt(0).toUpperCase() + kp.slice(1)).join('-'),
+    }))
+    .reduce((prev, cur) => {
+      const newKey = {};
+      newKey[cur.newName] = o[cur.startName];
+      return Object.assign(newKey, prev);
+    }, {});
+}
+
+function getURLCacheKey() {
+  return `puppeteer-bot-2a-url-parsed-cache:${parseInt(Date.now() / 1000 / 60 / 60 / 6, 10)}:h`;
+}
 
 async function puppeteerErrorRetry(fn) {
   let lastError = null;
@@ -52,6 +77,76 @@ async function puppeteerErrorRetry(fn) {
 
   throw lastError;
 }
+const HeaderOrders = ['Host', 'Connection', 'Accept-Encoding', 'Accept-Language', 'User-Agent', 'Accept', 'Referer'];
+const OmittedHeaders = ['X-Devtools-Emulate-Network-Conditions-Client-Id'];
+async function fetchURLResponse({
+  req, proxy, raw = false, bot = {},
+}) {
+  let headers = uppercaseObjKeys(req.headers);
+
+  if (!headers.Connection) headers.Connection = 'keep-alive';
+  if (!headers.Host) headers.Host = url.parse(req.url).host;
+
+  headers = Object.keys(headers)
+    .filter(k => !~OmittedHeaders.concat(bot.anonymizeReferer ? ['Referer'] : []).indexOf(k))
+    .sort((a, b) => {
+      const orderA = HeaderOrders.indexOf(a);
+      const orderB = HeaderOrders.indexOf(b);
+
+      return (~orderA ? orderA : Number.MAX_SAFE_INTEGER) - (
+        ~orderB ? orderB : Number.MAX_SAFE_INTEGER);
+    })
+    .reduce((p, c) => Object.assign(p, { [c]: headers[c] }), {});
+
+  const jar = bot && bot.getRequestCookieJar && await bot.getRequestCookieJar();
+  const [resp, body] = await rp({
+    url: req.url,
+    headers,
+    gzip: true,
+    proxy,
+    forever: true,
+    encoding: null,
+    strictSSL: false,
+    followRedirect: false,
+    maxRedirects: 0,
+    followAllRedirects: false,
+    jar,
+  });
+
+  if (bot && bot.page) {
+    const cookies = (Array.isArray(resp.headers['set-cookie']) ? resp.headers['set-cookie'] : [resp.headers['set-cookie']])
+      .filter(s => !!s)
+      .map(str => toughCookie.parse(str).toJSON())
+      .map(c => Object.assign(c, {
+        name: c.key,
+        expires: !c.expires ? undefined : Date.parse(c.expires) / 1000,
+        session: !c.expires,
+      }))
+      .map((c) => {
+        // eslint-disable-next-line no-param-reassign
+        if (_.isNaN(c.expires)) delete c.expires;
+        return c;
+      });
+    if (cookies.length > 0) {
+      await bot.page.setCookie(...cookies);
+    }
+  }
+
+  if (!resp.headers['content-length']) {
+    Object.assign(resp.headers, { 'content-length': body.length });
+  }
+
+  let decodedBody = body;
+  if (resp.headers['content-encoding'] === 'br') {
+    decodedBody = Buffer.from(brotliDecompress(body));
+  }
+
+  return (raw ? s => s : JSON.stringify)({
+    status: resp.statusCode,
+    headers: resp.headers,
+    body: raw ? decodedBody : decodedBody.toString('base64'),
+  });
+}
 
 async function streamToBuffer(stream) {
   return new Promise((resolve, reject) => {
@@ -62,37 +157,6 @@ async function streamToBuffer(stream) {
   });
 }
 
-function getGeo(latitude = 34.0224, longitude = 118.4768, radiusInMeters) {
-  const getRandomCoordinates = (radius, uniform) => {
-    let a = Math.random();
-    let b = Math.random();
-    if (uniform) {
-      if (b < a) {
-        const c = b;
-        b = a;
-        a = c;
-      }
-    }
-    return [
-      b * radius * Math.cos(2 * Math.PI * a / b),
-      b * radius * Math.sin(2 * Math.PI * a / b),
-    ];
-  };
-
-  const randomCoordinates = getRandomCoordinates(radiusInMeters, true);
-  const earth = 6378137;
-
-  const northOffset = randomCoordinates[0];
-  const eastOffset = randomCoordinates[1];
-
-  const offsetLatitude = northOffset / earth;
-  const offsetLongitude = eastOffset / (earth * Math.cos(Math.PI * (latitude / 180)));
-
-  return {
-    latitude: latitude + (offsetLatitude * (180 / Math.PI)),
-    longitude: longitude + (offsetLongitude * (180 / Math.PI)),
-  };
-}
 
 const WEBGL_RENDERERS = ['ANGLE (NVIDIA Quadro 2000M Direct3D11 vs_5_0 ps_5_0)', 'ANGLE (NVIDIA Quadro K420 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA Quadro 2000M Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA Quadro K2000M Direct3D11 vs_5_0 ps_5_0)', 'ANGLE (Intel(R) HD Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics Family Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Radeon HD 3800 Series Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics 4000 Direct3D11 vs_5_0 ps_5_0)', 'ANGLE (Intel(R) HD Graphics 4000 Direct3D11 vs_5_0 ps_5_0)', 'ANGLE (AMD Radeon R9 200 Series Direct3D11 vs_5_0 ps_5_0)', 'ANGLE (Intel(R) HD Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics Family Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics Family Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics 4000 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics 3000 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Mobile Intel(R) 4 Series Express Chipset Family Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) G33/G31 Express Chipset Family Direct3D9Ex vs_0_0 ps_2_0)', 'ANGLE (Intel(R) Graphics Media Accelerator 3150 Direct3D9Ex vs_0_0 ps_2_0)', 'ANGLE (Intel(R) G41 Express Chipset Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 6150SE nForce 430 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics 4000)', 'ANGLE (Mobile Intel(R) 965 Express Chipset Family Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics Family)', 'ANGLE (NVIDIA GeForce GTX 760 Direct3D11 vs_5_0 ps_5_0)', 'ANGLE (NVIDIA GeForce GTX 760 Direct3D11 vs_5_0 ps_5_0)', 'ANGLE (NVIDIA GeForce GTX 760 Direct3D11 vs_5_0 ps_5_0)', 'ANGLE (AMD Radeon HD 6310 Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) Graphics Media Accelerator 3600 Series Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) G33/G31 Express Chipset Family Direct3D9 vs_0_0 ps_2_0)', 'ANGLE (AMD Radeon HD 6320 Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) G33/G31 Express Chipset Family (Microsoft Corporation - WDDM 1.0) Direct3D9Ex vs_0_0 ps_2_0)', 'ANGLE (Intel(R) G41 Express Chipset)', 'ANGLE (ATI Mobility Radeon HD 5470 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) Q45/Q43 Express Chipset Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 310M Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) G41 Express Chipset Direct3D9 vs_3_0 ps_3_0)', 'ANGLE (Mobile Intel(R) 45 Express Chipset Family (Microsoft Corporation - WDDM 1.1) Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GT 440 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Radeon HD 4300/4500 Series Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 7310 Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics)', 'ANGLE (Intel(R) 4 Series Internal Chipset Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon(TM) HD 6480G Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Radeon HD 3200 Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 7800 Series Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) G41 Express Chipset (Microsoft Corporation - WDDM 1.1) Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 210 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GT 630 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 7340 Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) 82945G Express Chipset Family Direct3D9 vs_0_0 ps_2_0)', 'ANGLE (NVIDIA GeForce GT 430 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 7025 / NVIDIA nForce 630a Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) Q35 Express Chipset Family Direct3D9Ex vs_0_0 ps_2_0)', 'ANGLE (Intel(R) HD Graphics 4600 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 7520G Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD 760G (Microsoft Corporation WDDM 1.1) Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GT 220 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 9500 GT Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics Family Direct3D9 vs_3_0 ps_3_0)', 'ANGLE (Intel(R) Graphics Media Accelerator HD Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 9800 GT Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) Q965/Q963 Express Chipset Family (Microsoft Corporation - WDDM 1.0) Direct3D9Ex vs_0_0 ps_2_0)', 'ANGLE (NVIDIA GeForce GTX 550 Ti Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) Q965/Q963 Express Chipset Family Direct3D9Ex vs_0_0 ps_2_0)', 'ANGLE (AMD M880G with ATI Mobility Radeon HD 4250 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GTX 650 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Mobility Radeon HD 5650 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Radeon HD 4200 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 7700 Series Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) G33/G31 Express Chipset Family)', 'ANGLE (Intel(R) 82945G Express Chipset Family Direct3D9Ex vs_0_0 ps_2_0)', 'ANGLE (SiS Mirage 3 Graphics Direct3D9Ex vs_2_0 ps_2_0)', 'ANGLE (NVIDIA GeForce GT 430)', 'ANGLE (AMD RADEON HD 6450 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Radeon 3000 Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) 4 Series Internal Chipset Direct3D9 vs_3_0 ps_3_0)', 'ANGLE (Intel(R) Q35 Express Chipset Family (Microsoft Corporation - WDDM 1.0) Direct3D9Ex vs_0_0 ps_2_0)', 'ANGLE (NVIDIA GeForce GT 220 Direct3D9 vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 7640G Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD 760G Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 6450 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GT 640 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 9200 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GT 610 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 6290 Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Mobility Radeon HD 4250 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 8600 GT Direct3D9 vs_3_0 ps_3_0)', 'ANGLE (ATI Radeon HD 5570 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 6800 Series Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) G45/G43 Express Chipset Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Radeon HD 4600 Series Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA Quadro NVS 160M Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics 3000)', 'ANGLE (NVIDIA GeForce G100)', 'ANGLE (AMD Radeon HD 8610G + 8500M Dual Graphics Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Mobile Intel(R) 4 Series Express Chipset Family Direct3D9 vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 7025 / NVIDIA nForce 630a (Microsoft Corporation - WDDM) Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) Q965/Q963 Express Chipset Family Direct3D9 vs_0_0 ps_2_0)', 'ANGLE (AMD RADEON HD 6350 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (ATI Radeon HD 5450 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce 9500 GT)', 'ANGLE (AMD Radeon HD 6500M/5600/5700 Series Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Mobile Intel(R) 965 Express Chipset Family)', 'ANGLE (NVIDIA GeForce 8400 GS Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (Intel(R) HD Graphics Direct3D9 vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GTX 560 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GT 620 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GTX 660 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon(TM) HD 6520G Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA GeForce GT 240 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (AMD Radeon HD 8240 Direct3D9Ex vs_3_0 ps_3_0)', 'ANGLE (NVIDIA Quadro NVS 140M)', 'ANGLE (Intel(R) Q35 Express Chipset Family Direct3D9 vs_0_0 ps_2_0)'];
 
@@ -120,8 +184,6 @@ function getBrowserfingerprint(buid, emulateFlag) {
     if (idx < 62) return buidHash.readUInt32BE(idx) / UINT32_MAX;
     return buidHash.readUInt32LE(idx - 62) / UINT32_MAX;
   };
-
-  redis.multi().set(`puppeteer-bot-2a:fingerprint:${emulateFlag}`, JSON.stringify(fingerprint)).exec((error) => { });
   return fingerprint;
 }
 
@@ -158,24 +220,32 @@ function isVisible(obj) {
 
 class PuppeteerBot {
   constructor({
-    userId,
+    botId,
     proxy,
     credential,
     chromeUserData,
     label = 'puppeteer-bot',
     interaction,
+    urlCacheSkipRules,
+    requestSoftAbortRules = [],
+    requestHardAbortRules = [],
     browserTimeout = 45 * 60 * 1000,
     minWidth = 1024,
     minHeight = 1080,
     anonymizeReferer = false,
+    logger,
     trustChromeNativeRequest = false,
+    requestURLReplacer = r => r.url(),
     preferNonHeadless = false,
     disguiseFlags = [],
     emulateFlag = 'desktop',
-    enableRequestInterception = true,
+    revision,
+    executablePath,
+    browserless = false,
+    torBrowsingEnabled = false,
   } = {}) {
     this.interaction = interaction;
-    this.userId = userId || shortid.generate();
+    this.botId = botId || shortid.generate();
     this.proxy = proxy;
     this.credential = credential;
     this.chromeUserData = chromeUserData;
@@ -183,12 +253,19 @@ class PuppeteerBot {
     this.cleanUps = [];
     this.requestIds = [];
 
+    // eslint-disable-next-line no-console
+    this.logger = logger || console.log.bind(console);
     this.label = label;
 
     this.healthCheckTimeout = undefined;
     this.browserTimeout = browserTimeout;
 
-    this.browserUniqueID = this.userId;
+    this.browserUniqueID = uuid.v4();
+
+    this.urlCacheSkipRules = urlCacheSkipRules;
+    this.requestSoftAbortRules = requestSoftAbortRules;
+    this.requestHardAbortRules = requestHardAbortRules;
+    this.requestURLReplacer = requestURLReplacer;
 
     this.minWidth = minWidth;
     this.minHeight = minHeight;
@@ -200,33 +277,39 @@ class PuppeteerBot {
     this.disguiseFlags = disguiseFlags;
     this.emulateFlag = emulateFlag;
 
-    this.enableRequestInterception = enableRequestInterception;
+    this.trustChromeNativeRequest = trustChromeNativeRequest;
+
+    this.preferNonHeadless = preferNonHeadless;
+    this.disguiseFlags = disguiseFlags;
+
+    this.revision = revision;
+    this.executablePath = executablePath;
+    this.browserless = browserless;
+
+    this.tor = torBrowsingEnabled;
   }
 
   /**
-   *
-   * @description
-   * @static
-   * @param {*} page
-   * @param {*} [{
-   *     browserUniqueID,
-   *     logger,
-   *     minWidth = 1280,
-   *     minHeight = 1024,
-   *     disguiseFlags = [],
-   *     emulateFlag = 'desktop',
-   *   }={}]
-   * @memberof PuppeteerBot
+   * Disguises page to evade bot detection strategies
    */
-  static async disguisePage(page, {
-    browserUniqueID,
+  static async disguisePage(page, browserContext, {
+    browserUniqueID = uuid.v4(),
     logger,
     minWidth = 1280,
     minHeight = 1024,
     disguiseFlags = [],
     emulateFlag = 'desktop',
+    geolocation,
   } = {}) {
     const fingerprint = getBrowserfingerprint(browserUniqueID, emulateFlag);
+    logger.info(`fingerprint-webgl-vendor-${fingerprint.WEBGL_VENDOR}`);
+    logger.info(`fingerprint-webgl-renderer-${fingerprint.WEBGL_RENDERER}`);
+    logger.info(`fingerprint-ua-ua-${fingerprint.userAgent}`);
+    logger.info(`fingerprint-ua-platform-${fingerprint.platform}`);
+    logger.info(`fingerprint-deviceCategory-${fingerprint.deviceCategory}`);
+    logger.info(`fingerprint-viewportHeight-${fingerprint.viewportHeight}`);
+    logger.info(`fingerprint-viewportWidth-${fingerprint.viewportWidth}`);
+
 
     const LOG_OVERRIDE = true;
     if (LOG_OVERRIDE) {
@@ -253,13 +336,54 @@ class PuppeteerBot {
     };
 
     /* eslint-disable */
-    await page.evaluateOnNewDocument(async (fingerprint, LO, D, flags) => {
+    await page.evaluateOnNewDocument(async (fingerprint, LO, isVisibleStr, D, flags) => {
       const F = new Set(flags);
+      setTimeout(() => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const name in this) {
+          // eslint-disable-next-line no-continue
+          if (name === 'webkitStorageInfo') continue;
+          try {
+            // Check CoinHive like miners
+            if (this[name] &&
+              typeof this[name] !== 'undefined' &&
+              typeof this[name].isRunning === 'function' &&
+              typeof this[name].stop === 'function' &&
+              (typeof this[name]._siteKey === 'string' || typeof this[name]._newSiteKey === 'string' || typeof this[name]._address === 'string')
+            ) {
+              // eslint-disable-next-line no-console
+              console.log('[+] Coinhive miner found, stopping...');
+              this[name].stop();
+              this[name] = null;
+            }
+
+            // Check Mineralt miners
+            if (this[name] &&
+              typeof this[name] !== 'undefined' &&
+              typeof this[name].db === 'function' &&
+              typeof this[name].getlf === 'function' &&
+              typeof this[name].stop === 'function' &&
+              typeof this[name].hps === 'function'
+            ) {
+              // eslint-disable-next-line no-console
+              console.log('[+] Mineralt miner found, stopping...');
+              this[name].stop();
+              this[name] = null;
+            }
+          } catch (err) {
+            // ignore
+          }
+        }
+      }, 2000);
+
+      // eslint-disable-next-line no-eval
+      eval(isVisibleStr);
+      window.eyIsVisible = isVisible;
 
       const logOverride = (key, value) => {
         if (!LO) return value;
         // eslint-disable-next-line no-console
-        console.log(`Overriden: ${key}=${value}`);
+        console.warn(`Overriden: ${key}=${value}`);
         return value;
       };
 
@@ -268,7 +392,9 @@ class PuppeteerBot {
         plugin.length = spec.mimeTypes.length;
         spec.mimeTypes.forEach((m, i) => {
           plugin[i] = m;
-          Object.assign(m, { enabledPlugin: plugin });
+          Object.assign(m, {
+            enabledPlugin: plugin
+          });
         });
         // eslint-disable-next-line no-param-reassign
         delete spec.mimeTypes;
@@ -301,8 +427,7 @@ class PuppeteerBot {
           filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai',
         }),
         2: buildPlugin({
-          mimeTypes: [
-            {
+          mimeTypes: [{
               type: 'application/x-nacl',
               suffixes: '',
               description: 'Native Client Executable',
@@ -420,7 +545,7 @@ class PuppeteerBot {
       window.__defineGetter__('webkitRTCPeerConnection', () => logOverride('webkitRTCPeerConnection', undefined));
       window.__defineGetter__('webkitRTCSessionDescription', () => logOverride('webkitRTCSessionDescription', undefined));
 
-      // this will pass canvas detection
+      // canvas
       if (!F.has('-canvas')) {
         class WebGLRenderingContext {
           constructor(cvs) {
@@ -452,8 +577,8 @@ class PuppeteerBot {
         const canvasProto = Object.getPrototypeOf(canvas);
         const origGetContext = canvasProto.getContext;
         canvasProto.getContext = function getContext(...args) {
-          const context = origGetContext && (origGetContext.call(this, ...args)
-            || origGetContext.call(this, args[0]));
+          const context = origGetContext && (origGetContext.call(this, ...args) ||
+            origGetContext.call(this, args[0]));
           if (!context) {
             logOverride('canvas.getContext', 'new WebGLRenderingContext()');
             return new WebGLRenderingContext(this);
@@ -517,8 +642,8 @@ class PuppeteerBot {
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         if (gl) {
           glProto.getParameter = function getParameter(...args) {
-            if (args[0] === debugInfo.UNMASKED_VENDOR_WEBGL) return logOverride('gl.getParameter.UNMASKED_VENDOR_WEBGL', fingerprint.GL_PARAMETER.VENDOR);
-            if (args[0] === debugInfo.UNMASKED_RENDERER_WEBGL) return logOverride('gl.getParameter.UNMASKED_RENDERER_WEBGL', fingerprint.GL_PARAMETER.RENDERER);
+            if (args[0] === debugInfo.UNMASKED_VENDOR_WEBGL) return logOverride('gl.getParameter.UNMASKED_VENDOR_WEBGL', fingerprint.WEBGL_VENDOR);
+            if (args[0] === debugInfo.UNMASKED_RENDERER_WEBGL) return logOverride('gl.getParameter.UNMASKED_RENDERER_WEBGL', fingerprint.WEBGL_RENDERER);
             if (args[0] === 33901) return new Float32Array([1, 8191]);
             if (args[0] === 3386) return new Int32Array([16384, 16384]);
             if (args[0] === 35661) return 80;
@@ -546,16 +671,13 @@ class PuppeteerBot {
         hookPrototypeMethods('history', window.history);
       }
 
-      hookPrototypeMethods('screen', window.screen);
-      hookPrototypeMethods('navigator', window.navigator);
-      hookPrototypeMethods('history', window.history);
-
       // Pass the Permissions Test.
       const originalQuery = window.navigator.permissions.query;
-      return window.navigator.permissions.query = (parameters) => ( parameters.name === 'notifications' ? Promise.resolve({ state: Notification.permission }) : originalQuery(parameters)
-  );
+      return window.navigator.permissions.query = (parameters) => (parameters.name === 'notifications' ? Promise.resolve({
+        state: Notification.permission
+      }) : originalQuery(parameters));
 
-    }, fingerprint, LOG_OVERRIDE, DIMENSION, disguiseFlags);
+    }, fingerprint, LOG_OVERRIDE, isVisible.toString(), DIMENSION, disguiseFlags);
     /* eslint-enable */
 
     await page.goto('about:blank');
@@ -568,18 +690,21 @@ class PuppeteerBot {
       'Accept-Encoding': 'gzip, deflate, br',
     });
 
+    // spoof geolocation if available
+    await browserContext.overridePermissions(page.url(), ['geolocation']);
+    if (_.isFinite(geolocation.latitude) && _.isFinite(geolocation.longitude)) {
+      debug(`geolocation-spoofed-${geolocation.latitude}:${geolocation.longitude}`);
+      await page.setGeolocation({
+        latitude: geolocation.latitude,
+        longitude: geolocation.longitude,
+      });
+    }
+
     await page.setViewport(DIMENSION);
-    await page.setDefaultTimeout(120000);
+    await page.setDefaultTimeout(30000);
   }
 
-
-
-  /**
-   * @description: Resolves a CaptchaTask using supported provider AntiCaptcha
-   * @param {*} task
-   * @returns
-   * @memberof PuppeteerBot
-   */
+  /* eslint-disable */
   async resolveCaptchaTask(task) {
     const [, captchaRequestBody] = await rp({
       url: 'https://api.anti-captcha.com/createTask',
@@ -591,13 +716,13 @@ class PuppeteerBot {
       },
       json: true,
     });
-    if (!captchaRequestBody.taskId) throw new Error(500, `taskId is not available: ${captchaRequestBody.errorDescription}`);
+    if (!captchaRequestBody.taskId) throw new Error(`taskId is not available: ${captchaRequestBody.errorDescription}`);
 
     for (;;) {
       // eslint-disable-next-line no-await-in-loop
       await wait(2000);
 
-      let captchaResponseBody;
+      let captchaResponseBody
       try {
         // eslint-disable-next-line no-await-in-loop
         const [, body] = await rp({
@@ -630,15 +755,7 @@ class PuppeteerBot {
       }
     }
   }
-  /* eslint-enable */
 
-
-  /**
-   * @description: Solves captcha and retuns solution (Only ImageToText)
-   * @param {*} buffer
-   * @returns
-   * @memberof PuppeteerBot
-   */
   async resolveCaptcha(buffer) {
     try {
       if (!Buffer.isBuffer(buffer)) {
@@ -652,7 +769,7 @@ class PuppeteerBot {
         body: buffer.toString('base64'),
       })) || {}).text || '';
     } catch (error) {
-      console.error('failed-resolve-captcha', await this.dump({
+      this.logger.error('failed-resolve-captcha', await this.dump({
         error,
         buffer: buffer.toString('base64'),
       }));
@@ -660,79 +777,17 @@ class PuppeteerBot {
     }
   }
 
-  async uploadBlob(file, contentType, buffer) {
-    const container = 'puppeteer-bot-2-dump';
-    const filename = `${this.label}-${parseInt(Date.now() / 1000 / 60 / 60 / 24 / 7, 10)}/${file}`;
-
-    return new Promise((resolve, reject) => {
-        const stream = azure.blob.createWriteStreamToBlockBlob(
-            container,
-            filename, {
-                contentType,
-                contentSettings: {
-                    contentType,
-                },
-            },
-            (err) => {
-                if (err) reject(err);
-                resolve(`https://anonyblob2.blob.core.windows.net/${container}/${filename}`);
-            },
-        );
-        stream.write(buffer);
-        stream.end();
-    });
-  }
-
-
-  /**
-   * @description: dumps active html browser content and screenshot to Azure storage blob service.
-   * @param {*} [rootObj={}]
-   * @returns
-   * @memberof PuppeteerBot
-   */
   async dump(rootObj = {}) {
-      try {
-          if (this.page) {
-              const blobUrlContent = await this.uploadBlob(
-                  `content/${uuid()}-${Date.now()}.html`,
-                  'text/html',
-                  Buffer.from(await puppeteerErrorRetry(async() => this.page.content())),
-              );
-              Object.assign(rootObj, {
-                  blobUrlContent,
-              });
-          }
-      } catch (error) {
-          //
-      }
-
-      try {
-          if (this.page) {
-              const blobUrlScreenshot = await this.uploadBlob(
-                  `screenshots/${uuid()}-${Date.now()}.png`,
-                  'image/png',
-                  await puppeteerErrorRetry(async() => this.page.screenshot()),
-              );
-              Object.assign(rootObj, {
-                  blobUrlScreenshot,
-              });
-          }
-      } catch (error) {
-          //
-      }
-
-      return rootObj;
+    return rootObj;
   }
 
-
-
-  /**
-   * @description: initializes the puppeteer bot & imports chrome user data, cookies, etc if specified
-   * @memberof PuppeteerBot
-   */
   async init() {
     if (this.credential) {
       await this.importCredential(this.credential);
+    } else if (this.chromeUserData) {
+      this.parsedCredential = {
+        chromeUserData: this.chromeUserData,
+      };
     }
 
     if (this.messageRules && this.interaction) {
@@ -748,9 +803,49 @@ class PuppeteerBot {
       await this.stopBrowser();
       await this.stopHealthCheck();
     } catch (error) {
-      console.error('deinit-error', { error });
+      this.logger.error('deinit-error', {
+        error,
+      });
     }
   }
+
+  async fetchURLCache(req) {
+    this.logger.info('redis-url-cache-miss', { url: req.url });
+    const response = await fetchURLResponse({ req, bot: this });
+
+    const key = getURLCacheKey();
+    const field = req.url;
+    // prevent block
+    redis.multi().hset(key, field, response).expire(key, 60 * 60 * 6).exec((error) => {
+      if (error) this.logger.error('redis-url-cache-store-error', { error, url: req.url });
+    });
+
+    const parsed = JSON.parse(response);
+    parsed.body = Buffer.from(parsed.body, 'base64');
+    return parsed;
+  }
+
+
+  async getURLCache(req) {
+    try {
+      const key = getURLCacheKey();
+      const field = req.url;
+
+      const response = await redis.hget(key, field);
+      if (!response) return this.fetchURLCache(req);
+
+      const parsed = JSON.parse(response);
+      parsed.body = Buffer.from(parsed.body, 'base64');
+      return parsed;
+    } catch (error) {
+      this.logger.error('redis-url-cache-error', {
+        error,
+        url: req.url,
+      });
+      return JSON.parse(await this.fetchURLCache(req));
+    }
+  }
+
 
   idleCallbackCalled(id) {
     if (this.idleCallbackResolves[id]) {
@@ -764,7 +859,7 @@ class PuppeteerBot {
     contentLevel = PuppeteerBot.ContentLevel.MEANINGFUL,
   } = {}) {
     if (!Array.isArray(contentLevel) || contentLevel.length !== 2) throw new Error('unknown-content-level');
-    const timeoutError = new rror(504, 'waitForNetworkIdle timeout');
+    const timeoutError = new Error(504, 'waitForNetworkIdle timeout');
 
     function checkLifecycle(frame, expectedLifecycle, expectedLifecycleForMain = []) {
       const lifecycles = expectedLifecycle.concat(expectedLifecycleForMain);
@@ -826,15 +921,11 @@ class PuppeteerBot {
     this.incompleteRequests = [];
   }
 
+  async clickCheckbox(query, value = true) {
+    return this.$$check(query, value);
+  }
 
-  /**
-   * @description: For given selector attempt to check the corresponding element - as in a checkbox.
-   * @param {*} query
-   * @param {boolean} [value=true]
-   * @returns
-   * @memberof PuppeteerBot
-   */
-  async check(query, value = true) {
+  async $$check(query, value = true) {
     const handles = await puppeteerErrorRetry(async () => this.page.$$(query));
 
     let worked = null;
@@ -851,13 +942,6 @@ class PuppeteerBot {
   }
 
 
-  /**
-   * @description: Checks if ElementHandle has been checked properly
-   * @param {*} handle
-   * @param {boolean} [value=true]
-   * @returns
-   * @memberof PuppeteerBot
-   */
   async checkElementHandle(handle, value = true) {
     let worked = null;
     worked = worked || false;
@@ -871,6 +955,7 @@ class PuppeteerBot {
     return worked;
   }
 
+
   async $$safeEval(q, fn, ...args) {
     try {
       return await puppeteerErrorRetry(async () => this.page.$$eval(q, fn, ...args));
@@ -882,24 +967,86 @@ class PuppeteerBot {
     }
   }
 
+  /**
+   * Optional utilities to upload screenshots and page content to S3 and Google Cloud.
+   */
+  async captureToFirebase(name) {
+    if (!gcs) return null;
+    try {
+      await Promise.all([
+        (async () => this.uploadToFirebase('text/html', `${name}-${Date.now()}.html`, await this.page.content()))(),
+        (async () => this.uploadToFirebase('image/png', `${Date.now()}-${name}.png`, await this.page.screenshot()))(),
+      ]);
+    } catch (error) {
+      this.logger.error('error-captureToFirebase', {
+        error,
+      });
+    }
+  }
+
+  async uploadToFirebase(ContentType, filename, Body) {
+    if (!gcs) return null;
+    try {
+      const bucket = gcs.bucket('puppeteer-bot-dump');
+      const dest = `${this.botId}/${filename}`;
+      const options = {
+        destination: dest,
+        metadata: {
+          contentType: ContentType,
+        },
+        public: true,
+      };
+      const file = bucket.file(dest);
+      await file.save(Body, options);
+    } catch (error) {
+      this.logger.error('firebaseUpload', {
+        error,
+      });
+    }
+  }
+
+  async captureToS3(name) {
+    if (!s3) return null;
+    try {
+      await Promise.all([
+        (async () => this.uploadToS3('text/html', `${Date.now()}-${name}.html`, await this.page.content()))(),
+        (async () => this.uploadToS3('image/png', `${name}-${Date.now()}.png`, await this.page.screenshot({
+          fullPage: true,
+        })))(),
+      ]);
+    } catch (error) {
+      this.logger.error('captureToS3', {
+        error,
+      });
+    }
+  }
+
+  async uploadToS3(ContentType, filename, Body) {
+    if (!s3 && !this.botid) return null;
+    try {
+      await s3.upload({
+        Body,
+        Bucket: 'puppeteer-bots-dump',
+        ContentType,
+        Key: [process.env.NODE_ENV === 'production' ? 'prod' : 'dev', `${this.botId}/${filename}`].join('/'),
+      }).promise();
+    } catch (error) {
+      this.logger.error('s3Upload', {
+        error,
+      });
+    }
+  }
+
 
   /**
-   * @description: Critical function that gets all visible element handles on the DOM for a given CSS selector.
-   * @param {*} selector
-   * @param {boolean} [shouldIncludeInvisible=false]
-   * @returns
-   * @memberof PuppeteerBot
+   * Magic
    */
   async $$(selector, shouldIncludeInvisible = false) {
     const includeInvisible = !!shouldIncludeInvisible;
     if (!this.internal$$batches) this.internal$$batches = [];
 
     const promise = new Promise((resolve, reject) => this.internal$$batches.push({
-      resolve,
-      reject,
-      selector,
-      includeInvisible,
-      key: `${selector}:${includeInvisible}`,
+      resolve, reject, selector, includeInvisible, key: `${selector}:${includeInvisible}`,
     }));
 
     setImmediate(() => {
@@ -911,9 +1058,7 @@ class PuppeteerBot {
 
       // map batches
       const argKeyMap = batches
-        .reduce((m, c) => Object.assign(m, {
-          [c.key]: [...(m[c.key] || []), c],
-        }), {});
+        .reduce((m, c) => Object.assign(m, { [c.key]: [...(m[c.key] || []), c] }), {});
 
       (async () => {
         try {
@@ -931,9 +1076,7 @@ class PuppeteerBot {
                 }))
                 .filter(o => o.result.length > 0)
                 // at this point, we are guaranteed that key is unique in the array
-                .reduce((m, c) => Object.assign(m, {
-                  [c.key]: c.result,
-                }), {})),
+                .reduce((m, c) => Object.assign(m, { [c.key]: c.result }), {})),
               Object.values(argKeyMap).map(a => _.pick(a[0], 'selector', 'includeInvisible', 'key')),
             )).getProperties();
 
@@ -954,18 +1097,18 @@ class PuppeteerBot {
               try {
                 b.resolve(aggregatedMap.get(key) || []);
               } catch (e) {
-                console.error('$$-resolve-error');
+                this.logger('$$-resolve-error', { error: e });
               }
             });
           }));
         } catch (error) {
-          console.error('$$-aggregator-error');
+          this.logger('$$-aggregator-error', { error });
           // if error, all batches fails with same error
           batches.forEach((b) => {
             try {
               b.reject(error);
             } catch (e) {
-              console.error('$$-reject-error');
+              this.logger('$$-reject-error', { error: e });
             }
           });
         }
@@ -975,16 +1118,11 @@ class PuppeteerBot {
     return promise;
   }
 
+  async $fill(q, opt) {
+    return this.$$fill(q, opt);
+  }
 
-
-  /**
-   * @description
-   * @param {*} q: CSS selector
-   * @param {*} opt: value to fill
-   * @returns
-   * @memberof PuppeteerBot
-   */
-  async fill(q, opt) {
+  async $$fill(q, opt) {
     if (!opt) return false;
 
     const elementHandles = await this.page.$$(q);
@@ -1000,14 +1138,6 @@ class PuppeteerBot {
     return worked;
   }
 
-
-  /**
-   * @description: checks ElementHandle to verify if filled correctly
-   * @param {*} handle
-   * @param {*} opt
-   * @returns
-   * @memberof PuppeteerBot
-   */
   async checkFillElementHandle(handle, opt) {
     return puppeteerErrorRetry(async () => {
       if (!opt) return false;
@@ -1032,13 +1162,6 @@ class PuppeteerBot {
   }
 
 
-  /**
-   * @description: peforms a dirty select on item inside drop-down list
-   * @param {*} q
-   * @param {*} opt
-   * @returns
-   * @memberof PuppeteerBot
-   */
   async $select(q, opt) {
     if (!opt) return false;
 
@@ -1056,14 +1179,6 @@ class PuppeteerBot {
     return true;
   }
 
-
-  /**
-   * @description: will scroll into view safely, hover, hestitate for a ranodm delay, and invoke class member clickElementHandle()
-   * @param {*} handle
-   * @param {*} opt
-   * @returns
-   * @memberof PuppeteerBot
-   */
   async fillElementHandle(handle, opt) {
     return puppeteerErrorRetry(async () => {
       if (!opt) return false;
@@ -1095,8 +1210,7 @@ class PuppeteerBot {
 
       await this.page.evaluate(element => element.scrollIntoViewIfNeeded(), handle);
       await this.clickElementHandle(handle);
-
-      await new Promise(r => setTimeout(r, opt.delayBeforeType || 50));
+      await new Promise(r => setTimeout(r, opt.delayBeforeType || 65));
       const chars = `${v}`.split('');
       if (maxLength > 0 && chars.length > maxLength) {
         debug('input-validation-failed');
@@ -1130,15 +1244,28 @@ class PuppeteerBot {
     });
   }
 
+  async $click(selector) {
+    return this.$$click(selector);
+  }
 
-  async click(selector) {
+  async $$click(selector) {
     const elementHandles = await this.page.$$(selector);
+    debug(`$$click: ${elementHandles.length} elements found`);
     let result = false;
     for (let i = 0; i < elementHandles.length; i += 1) {
       // eslint-disable-next-line no-await-in-loop
-      result = await this.clickElementHandle(elementHandles[i]) || result;
+      result = await this.clickElementHandle(elementHandles[i], {
+        selector,
+      }) || result;
     }
     return result;
+  }
+
+  async selectByValue(opt) {
+    const text = opt.replace(/'/g, '\', "\'", \'');
+    const elementHandles = await this.page.$x((`//select[contains(text(), '${text}')]`));
+    if (!elementHandles) return false;
+    return this.clickElementHandle(elementHandles[0]);
   }
 
   async clickByLinkText(opt) {
@@ -1146,15 +1273,14 @@ class PuppeteerBot {
     const text = opt.replace(/'/g, `', "'", '`);
     const elementHandles = await this.page.$x(`//a[contains(text(), '${text}')]`);
     if (!elementHandles) return false;
-    await this.clickElementHandle(elementHandles[0]);
-    return true;
+    return this.clickElementHandle(elementHandles[0]);
   }
 
   async clickByButtonText(opt) {
     const text = opt.replace(/'/g, '\', "\'", \'');
     const elementHandles = await this.page.$x(`//button[contains(text(), '${text}')]`);
-    await this.clickElementHandle(elementHandles[0]);
-    return true;
+    if (!elementHandles) return false;
+    return this.clickElementHandle(elementHandles[0]);
   }
 
   async waitForNavigationOrSelector(selector, waitForNavOption = {
@@ -1163,8 +1289,7 @@ class PuppeteerBot {
     let resolved = false;
     try {
       console.time('waitForNavigationOrSelector');
-      // eslint-disable-next-line no-unused-vars
-      const result = await Promise.race([
+      await Promise.race([
         this.page.waitForNavigation(waitForNavOption),
         // eslint-disable-next-line consistent-return
         (async () => {
@@ -1182,30 +1307,29 @@ class PuppeteerBot {
     }
   }
 
-
-  /**
-   * @description:
-   * scrollIntoViewIfNeeded(), evaluate boundingBox
-   * [calculate randomized offset from center coordinates of element].[move mouse with randomized step between ms movements] to designated coordinates
-   * [click using randomized behavioral context]
-   * @param {*} handle
-   * @memberof PuppeteerBot
-   */
-  async clickElementHandle(handle) {
+  async clickElementHandle(handle, {
+    selector,
+  } = {}) {
     return puppeteerErrorRetry(async () => {
       if (!handle) {
-        console.error('clickElementHandle-empty-handle');
+        this.logger.warn('clickElementHandle-empty-handle', await this.dump({
+          selector,
+        }));
         return false;
       }
 
-      await this.page.evaluate(element => element.scrollIntoViewIfNeeded(), handle);
       const boundingBox = await handle.boundingBox();
       if (!boundingBox) {
+        this.logger.warn('clickElementHandle-empty-bounding-box', await this.dump({
+          selector,
+        }));
         return false;
       }
 
       if (!await this.page.evaluate(isVisible, handle)) {
-        this.logger.warn('clickElementHandle-invisible-handle');
+        this.logger.warn('clickElementHandle-invisible-handle', await this.dump({
+          selector,
+        }));
         return false;
       }
 
@@ -1246,12 +1370,22 @@ class PuppeteerBot {
         });
 
         if (result && result.contains) break;
-        // eslint-disable-next-line no-await-in-loop
-        await this.page.evaluate(e => e.scrollIntoView({
-          behavior: 'instant',
-          block: 'center',
-          inline: 'center',
-        }), handle);
+
+        if (i > 10) {
+          console.warn('click-target-covered', {
+            result,
+            x,
+            y,
+            width,
+            height,
+            targetX,
+            targetY,
+          });
+
+          // eslint-disable-next-line no-await-in-loop
+          await handle.click();
+          return true;
+        }
 
         // eslint-disable-next-line no-await-in-loop
         await new Promise(r => setTimeout(r, 100));
@@ -1270,10 +1404,10 @@ class PuppeteerBot {
     });
   }
 
-
   async waitForSelector(opt) {
     return this.page.waitForSelector(opt);
   }
+
 
   async startHealthCheck() {
     if (this.healthCheckTimeout) return;
@@ -1284,13 +1418,14 @@ class PuppeteerBot {
     }, 1000);
   }
 
+
   async healthCheckRepeater() {
     try {
       if (!await this.healthCheck()) {
         await this.stopBrowser();
       }
     } catch (error) {
-      console.error('health-check-repeater-error');
+      this.logger.error('health-check-repeater-error', await this.dump({ error }));
     } finally {
       if (this.browser && this.healthCheckTimeout) {
         this.healthCheckTimeout = setTimeout(async () => {
@@ -1304,21 +1439,22 @@ class PuppeteerBot {
     this.healthCheckStartedAt = this.healthCheckStartedAt || Date.now();
 
     if (Date.now() - this.healthCheckStartedAt > this.browserTimeout) {
-      console.error('health-check-failed-browser-timeout');
+      this.logger.error('health-check-failed-browser-timeout', await this.dump());
       return false;
     }
 
     try {
       if (this.interaction && this.interaction.isUp) {
         if (!await this.interaction.checkValid()) {
-          console.error('health-check-failed-interaction-invalid');
+          this.logger.error('health-check-failed-interaction-invalid', await this.dump());
           return false;
         }
       }
     } catch (error) {
-      this.logger.warn('health-check-failed-interaction-validity-error');
+      this.logger.warn('health-check-failed-interaction-validity-error', await this.dump({ error }));
       return false;
     }
+
     return true;
   }
 
@@ -1329,6 +1465,7 @@ class PuppeteerBot {
   }
 
   async startBrowser() {
+    const geolocation = {};
     if (!this.userDataDir) {
       const [dir, callback] = await new Promise((resolve, reject) => (
         tmp.dir({
@@ -1343,12 +1480,10 @@ class PuppeteerBot {
       this.userDataDir = dir;
       await this.loadUserData();
     }
-
-    let geo = getGeo();
-    let parsedProxy = null;
+    let parsedProxy = this.proxy ? url.parse(this.proxy) : null;
 
     if (this.proxy) {
-      this.logger.debug(`active proxy: ${this.proxy}`);
+      this.logger.debug(`active-proxy:${this.proxy}`);
       parsedProxy = url.parse(this.proxy);
 
       let publicIP;
@@ -1361,12 +1496,27 @@ class PuppeteerBot {
         // ignore
       }
       const hostname = publicIP || (url.parse(parsedProxy) || {}).hostname;
-      this.logger.info(`fingerprint-ip-${hostname}`);
+      this.logger.info(`fingerprint-ip:${hostname}`);
       try {
-        geo = geoip.lookup(publicIP);
-        this.logger.info(`fingerprint-maxmind-geoip-${geo.ll}`);
+        const maxmindResults = geoip.lookup(publicIP);
+        // eslint-disable-next-line prefer-destructuring
+        geolocation.latitude = maxmindResults.ll[0];
+        // eslint-disable-next-line prefer-destructuring
+        geolocation.longitude = maxmindResults.ll[1];
+
+        const {
+          region,
+          city,
+          range,
+        } = maxmindResults;
+
+        this.logger.info(`fingerprint-maxmind-geoip-latitude-${geolocation.latitude}`);
+        this.logger.info(`fingerprint-maxmind-geoip-longitude-${geolocation.longitude}`);
+        this.logger.info(`fingerprint-maxmind-geoip-city-${city}`);
+        this.logger.info(`fingerprint-maxmind-geoip-region-${region}`);
+        this.logger.info(`fingerprint-maxmind-geoip-range-${range}`);
       } catch (error) {
-        // ignore
+        this.logger.error(`maxmind-lookup-error-${error})`);
       }
     }
 
@@ -1375,59 +1525,62 @@ class PuppeteerBot {
       if (/Session closed\. Most likely the page has been closed/.test(error.message)) return;
       if (/Protocol error \(Runtime\.callFunctionOn\): Target closed/.test(error.message)) return;
       if (/Session error \(Runtime\.callFunctionOn\): Message timed out/.test(error.message)) return;
-      console.error(`page-error-${Buffer.from(error.message).toString('base64')}`, {
+      this.logger.error(`page-error-${Buffer.from(error.message).toString('base64')}`, {
         error,
       });
     };
 
     if (!this.browser) {
       const DISPLAY = this.preferNonHeadless ? process.env.XVFB_DISPLAY : process.env.DISPLAY;
+      const args = ['--no-sandbox', '--disable-setuid-sandbox', '--ignore-certificate-errors', '--disk-cache-size=1', `--user-data-dir=${this.userDataDir}`, '--disable-infobars'];
+
+      // support .onion
+      if (this.tor) {
+        args.push('--proxy-server=socks5://127.0.0.1:9150');
+      }
+      if (this.proxy) {
+        args.push(parsedProxy ? `--proxy-server=${parsedProxy.host}` : '');
+      }
+
       const options = {
         ignoreHTTPSErrors: true,
         headless: !this.preferNonHeadless,
-        ignoreDefaultArgs: ['--enable-automation'],
-        env: Object.assign({
-          DISPLAY,
-        }, process.env),
-        args: [
-          '--no-sandbox', '--disable-setuid-sandbox', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list',
-          '--disk-cache-size=1', `--user-data-dir=${this.userDataDir}`, '--disable-infobars', '--enable-features=NetworkService',
-          parsedProxy ? `--proxy-server=${parsedProxy.host}` : '',
-        ],
+        env: Object.assign({ DISPLAY }, process.env),
+        args,
       };
-      this.browser = await puppeteer.launch(options);
+
+      if (this.executablePath) options.executablePath = this.executablePath;
+      if (this.browserless) {
+        this.browser = await puppeteer.connect({
+          browserWSEndpoint: `wss://chrome.browserless.io/?token=${process.env.BROWSERLESS_KEY}`,
+        });
+      } else {
+        this.browser = await puppeteer.launch(options);
+      }
+
+      const version = await this.browser.version();
+      this.logger.info(`puppeteer-current-chromium-revision:${version}`);
 
       this.browser.on('error', errorListener);
-      this.browser.on('disconnected', () => {
-        this.browser = null;
-      });
+      // eslint-disable-next-line no-return-assign
+      this.browser.on('disconnected', () => this.browser = null);
+      this.browserContext = this.browser.defaultBrowserContext();
     }
 
     if (!this.page) {
       this.page = await this.browser.newPage();
 
-      const { address } = ([].concat(...Object.values(os.networkInterfaces())).filter(i => i.family === 'IPv4' && !i.internal)[0] || {});
-      // eslint-disable-next-line no-underscore-dangle
-      const { port } = url.parse(this.browser._connection.url());
-      // eslint-disable-next-line no-underscore-dangle
-      const targetId = this.page._client._targetId;
-
-      console.log('puppeteer-bot:ChromeDevToolAvailable', {
-        ws: `${address}:${port}/devtools/page/${targetId}`,
-        userId: this.userId,
-        bypassRateLimit: true,
-      });
-
       this.incompleteRequests = [];
 
-      await PuppeteerBot.disguisePage(this.page, {
-        browserUniqueID: this.userId,
+      await PuppeteerBot.disguisePage(this.page, this.browserContext, {
+        browserUniqueID: this.botId,
         logger: this.logger,
         minWidth: this.minWidth,
         minHeight: this.minHeight,
         options: this.disguiseOptions,
         disguiseFlags: this.disguiseFlags,
         emulateFlag: this.emulateFlag,
+        geolocation,
       });
 
       this.idleCallbackName = uuid().replace(/-/g, '');
@@ -1435,6 +1588,7 @@ class PuppeteerBot {
         this.idleCallbackCalled(id);
       });
 
+      // before load cookie, check cookie
       await this.loadCookies();
 
       if (parsedProxy && parsedProxy.auth) {
@@ -1445,33 +1599,143 @@ class PuppeteerBot {
         });
       }
 
-      if (this.proxy && _.isFinite(geo.ll[0]) && _.isFinite(geo.ll[1])) {
-        const context = this.browser.defaultBrowserContext();
-        await context.overridePermissions(this.page.url(), ['geolocation']);
-        await this.page.setGeolocation({ latitude: geo.ll[0], longitude: geo.ll[1] });
-      }
-
-      await this.page.setRequestInterception(this.enableRequestInterception);
-
       this.page.on('error', errorListener);
       this.page.on('close', () => {
         this.page = null;
       });
+
+      this.page.on('requestfailed', (interceptedReq) => {
+        this.requestIds = this.requestIds.filter(r => r.id !== interceptedReq.id);
+        const rurl = interceptedReq.url();
+        if (this.incompleteRequests) {
+          // eslint-disable-next-line no-underscore-dangle
+          this.incompleteRequests = this.incompleteRequests.filter(r => r !== interceptedReq);
+        }
+        // eslint-disable-next-line no-underscore-dangle
+        if (/net::ERR_ABORTED/.test(interceptedReq._failureText) || /net::ERR_CONNECTION_CLOSED/.test(interceptedReq._failureText) || /net::ERR_CONNECTION_REFUSED/.test(interceptedReq._failureText)) return;
+
+        // parse host only
+        let host = '';
+        try {
+          const parsed = url.parse(rurl);
+          if (parsed.hostname) {
+            host = `-${parsed.hostname}`;
+          }
+        } catch (error) {
+          // ignore
+        }
+
+        // eslint-disable-next-line no-underscore-dangle
+        this.logger.error(`request-failed-${interceptedReq._failureText}-${host}`, { skipList: true });
+      });
+
+      this.page.on('requestfinished', (interceptedReq) => {
+        this.requestIds = this.requestIds.filter(r => r.id !== interceptedReq.id);
+        if (this.incompleteRequests) {
+          // eslint-disable-next-line no-underscore-dangle
+          this.incompleteRequests = this.incompleteRequests.filter(r => r !== interceptedReq);
+        }
+      });
+
+      this.page.on('request', async (interceptedReq) => {
+        if (!this.enableRequestInterception) {
+          // Prevent throwing an error if enableRequestInterception is false
+          // eslint-disable-next-line no-param-reassign
+          interceptedReq.continue = () => {};
+          // eslint-disable-next-line no-param-reassign
+          interceptedReq.abort = () => {};
+        }
+
+        if (this.interceptRequest && this.interceptRequest(interceptedReq)) return null;
+
+        const rurl = this.requestURLReplacer(interceptedReq);
+        if (!rurl) return interceptedReq.abort();
+
+        if (this.requestSoftAbortRules.find(r => r.test(rurl)) !== undefined) return interceptedReq.abort('aborted');
+
+        this.requestIds = this.requestIds.filter(r => r.id !== interceptedReq.id);
+        this.requestIds.push({
+          id: this.requestIds.id,
+          at: Date.now(),
+        });
+
+        if (this.incompleteRequests) {
+          // eslint-disable-next-line no-underscore-dangle
+          this.incompleteRequests.push(interceptedReq);
+        }
+
+        if (!/^http[s]?:/i.test(rurl)) {
+          return interceptedReq.continue();
+        }
+
+        if (this.requestHardAbortRules.find(regex => interceptedReq.url().match(regex))) {
+          return interceptedReq.abort();
+        }
+
+        if (interceptedReq.redirectChain().length > 0) {
+          return interceptedReq.continue();
+        }
+
+        if ((interceptedReq.method() || '').toLowerCase() !== 'get') {
+          return interceptedReq.continue();
+        }
+
+        try {
+          // eslint-disable-next-line max-len
+          if (this.trustChromeNativeRequest || !this.enableRequestInterception) return interceptedReq.continue({ url: rurl });
+
+          if ((!this.urlCacheSkipRules || !this.urlCacheSkipRules.find(r => r.test(rurl))) && /^http[s]?:\/\/(.*)\/.+\.(js|css|woff|woff2|png|jpg|gif|bmp|ico)(\?.*)?$/i.test(rurl)) {
+            return interceptedReq.respond(await this.getURLCache({
+              url: rurl,
+              headers: interceptedReq.headers(),
+            }));
+          }
+
+          return interceptedReq.respond(await fetchURLResponse({
+            req: { url: rurl, headers: interceptedReq.headers() },
+            bot: this,
+            proxy: this.proxy,
+            raw: true,
+          }));
+        } catch (error) {
+          return interceptedReq.continue();
+        }
+      });
     }
   }
 
-  async newPage() {
+  async newPage(disguise = true) {
     const page = await this.browser.newPage();
+    if (disguise) return page;
+    return PuppeteerBot.disguisePage(page, {
+      browserUniqueID: this.botId,
+      logger: this.logger,
+      minWidth: this.minWidth,
+      minHeight: this.minHeight,
+      emulateFlag: this.emulateFlag,
+      disguiseFlags: this.disguiseFlags,
+    });
   }
-
 
   async stopBrowser() {
-    if (this.page) {
+    try {
+      if (this.page) {
         await this.page.close();
+      }
+    } catch (error) {
+      this.logger.error('failed-page-close', await this.dump({ error }));
+    } finally {
+      this.page = null;
     }
 
-    if (this.browser) {
+    try {
+      if (this.browser && this.browser.isConnected()) {
         await this.browser.close();
+      }
+    } catch (error) {
+      this.logger.error('failed-browser-close', await this.dump({ error }));
+    } finally {
+      this.browser = null;
     }
 
     if (this.cleanUps) {
@@ -1480,7 +1744,7 @@ class PuppeteerBot {
           this.cleanUps[i]();
         } catch (error) {
           // eslint-disable-next-line no-await-in-loop
-          console.error('failed-call-cleanUp', { error });
+          this.logger.error('failed-call-cleanUp', await this.dump({ error }));
         } finally {
           this.cleanUps.splice(i, 1);
         }
@@ -1490,11 +1754,7 @@ class PuppeteerBot {
     }
   }
 
-  /**
-   * @description: Imports a credential: establishes exact copy of prior file structure/chrome executable, sets cookies.
-   * @param {*} zbuf
-   * @memberof PuppeteerBot
-   */
+
   async importCredential(zbuf) {
     await new Promise((resolve, reject) => {
       zlib.gunzip(Buffer.from(zbuf, 'base64'), (err, buf) => {
@@ -1507,11 +1767,12 @@ class PuppeteerBot {
     await this.loadCredentials();
   }
 
-  /**
-   * @description: Returns a cookie jar
-   * @param {*}
-   * @memberof PuppeteerBot
-   */
+
+  async loadCredentials() {
+    await this.loadCookies();
+    await this.loadUserData();
+  }
+
   async getRequestCookieJar() {
     const jar = request.jar();
 
@@ -1534,13 +1795,6 @@ class PuppeteerBot {
     return jar;
   }
 
-
-
-  /**
-   * @description: loads cookies (all- both default and puppeteer-cookies)
-   * @returns
-   * @memberof PuppeteerBot
-   */
   async loadCookies() {
     if (!this.parsedCredential || !this.parsedCredential.cookies || !this.page) return;
 
@@ -1550,7 +1804,7 @@ class PuppeteerBot {
       await Promise.all(this.parsedCredential.cookies.map(async (c) => {
         const expires = parseInt(Date.parse(c.expires) / 1000, 10);
         if (_.isNaN(expires) || !_.isFinite(expires)) {
-          this.logger.warn('expires-nan', { cookies: this.parsedCredential.cookies });
+          this.logger.warn('expires-nan', await this.dump({ cookies: this.parsedCredential.cookies }));
         }
 
         const cookie = {
@@ -1567,7 +1821,7 @@ class PuppeteerBot {
         try {
           await this.page.setCookie(cookie);
         } catch (error) {
-          console.error('failed-setting-cookie', await this.dump({ cookie }));
+          this.logger.error('failed-setting-cookie', await this.dump({ cookie }));
         }
       }));
     }
@@ -1584,13 +1838,6 @@ class PuppeteerBot {
     stream.end(Buffer.isBuffer(this.parsedCredential.chromeUserData) ? this.parsedCredential.chromeUserData : Buffer.from(this.parsedCredential.chromeUserData, 'base64'));
   }
 
-
-
-  /**
-   * @description: Converts location where chromium is executing and files contained therein to a buffer. Used inside importCredential() for details.
-   * @returns string
-   * @memberof PuppeteerBot
-   */
   async getChromeUserData() {
     assert(this.userDataDir, 'userDataDir is empty');
 
@@ -1616,22 +1863,21 @@ class PuppeteerBot {
 
       return buf;
     } catch (error) {
-      console.error('error-getChromeUserData', { error });
+      this.logger.error('error-getChromeUserData', {
+        error,
+      });
       return Buffer.from('');
     }
   }
 
-
-  /**
-   * @description: Exports a string (base-64 encoded) containing all cookies and chromium prefs/file structure.
-   * @returns
-   * @memberof PuppeteerBot
-   */
   async exportCredential() {
     assert(this.page, 'page is empty');
 
     // eslint-disable-next-line no-underscore-dangle
-    const { cookies } = (await this.page._client.send('Network.getAllCookies'));
+    const {
+      cookies,
+    // eslint-disable-next-line no-underscore-dangle
+    } = (await this.page._client.send('Network.getAllCookies'));
 
     return new Promise(async (resolve, reject) => {
       try {

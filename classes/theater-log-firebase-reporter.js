@@ -12,7 +12,7 @@ class TheaterLogFirebaseReporter {
     show,
     bot,
     userId,
-    bucket = 'puppeteer-profile-logs',
+    bucket = 'puppeteer-bot-logs',
     logger,
   }) {
     assert(show instanceof Show, 'emitter is not instance of Show');
@@ -24,7 +24,8 @@ class TheaterLogFirebaseReporter {
     this.userId = userId || shortid.generate();
     this.incrValue = 0;
     this.bucket = gcs.bucket(bucket);
-    this.logger = logger || ey.logger(this.constructor.name);
+    // eslint-disable-next-line no-console
+    this.logger = logger || console.log.bind(console);
 
     this.botTasksCount = 0;
     this.botFreeResolves = [];
@@ -53,7 +54,7 @@ class TheaterLogFirebaseReporter {
         metadata: {
           contentType: ContentType,
         },
-        public: true,
+        public: false,
       };
 
       const dest = this.gcsKey(filename);

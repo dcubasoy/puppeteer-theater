@@ -77,6 +77,7 @@ class PuppeteerBotElement {
     return (await this.show.bot()).page.select(this.query.selector, ...value);
   }
 
+  // eslint-disable-next-line consistent-return
   async $select(opt) {
     if (!opt) {
       this.scene.log('Element:', this.query.selector, 'select-empty');
@@ -140,14 +141,7 @@ class PuppeteerBotElement {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).outerHTML || '').trim(), el)));
     const content = strs.filter(s => !!s).join('\n');
-
-    let options = { stripHtml: true };
-    if (opts) {
-      Object.assign(options, opts);
-    }
-
-    console.log(options);
-    return tabletojson.convert(content, options);
+    return tabletojson.convert(content);
   }
 
   async textContents() {

@@ -1,5 +1,5 @@
 const ExperianJustClickAwareScene = require('./just-click-aware-scene');
-const PromiseCondition = require('../../../../utils/promise-condition');
+const PromiseCondition = require('../../promise-condition');
 
 class ExperianCreateAccountStep1Scene extends ExperianJustClickAwareScene.WithSpinner {
   constructor(args) {

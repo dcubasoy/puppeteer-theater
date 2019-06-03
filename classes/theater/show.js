@@ -6,7 +6,7 @@ const debug = require('debug')('theater:show');
 const shortid = require('shortid');
 const util = require('util');
 const packageJson = require('../../package.json');
-const PromiseCondition = require('../../utils/promise-condition');
+const PromiseCondition = require('./promise-condition');
 const Scene = require('./scene');
 
 shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
@@ -78,7 +78,8 @@ class Show extends EventEmitter {
     super();
 
     this.ref = shortid.generate();
-    this.logger = logger || ey.logger(this.constructor.name);
+    // eslint-disable-next-line no-console
+    this.logger = logger || console.log;
     this.ctx = {};
     this.Scenes = Scenes || Object.values(this.constructor.Scenes) || [];
     this.Scenes.forEach((S, i) => assert(S.prototype instanceof Scene, `Scenes[${i}] ${S.name} is not valid Scene`));

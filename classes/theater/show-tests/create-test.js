@@ -17,7 +17,7 @@ async function test(testSetup, fn) {
 
 const NOP = () => {};
 
-ey.logger = () => ({
+const logger = () => ({
   error(e) { process.stderr.write(`${e.stack}\n`); },
   warn: NOP,
   info: NOP,
@@ -26,11 +26,10 @@ ey.logger = () => ({
 });
 
 async function runTests() {
-  // do setup things (initialize env)
-
   app.use('/', express.static(path.join(__dirname, './')));
   await new Promise(r => app.listen(PORT, r));
 
+  // specify show to skip in test
   let showTestGrep;
   if (process.env.SHOW_TEST_GREP) {
     showTestGrep = new RegExp(process.env.SHOW_TEST_GREP, 'gi');
@@ -46,11 +45,10 @@ async function runTests() {
     const startedAt = Date.now();
     let testStartedAt;
 
-    const bot = new PuppeteerBot2a({
+    const bot = new PuppeteerBot({
       minWidth: 1280,
       minHeight: 1024,
       preferNonHeadless: true,
-      enableRequestInterception: true,
     });
 
 
