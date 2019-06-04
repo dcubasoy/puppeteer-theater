@@ -10,8 +10,9 @@ A show **might describe an entire site, like "Capital One".** Within this show, 
 Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met? 
 This is a core value proposition  theater delivers on. By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manually to appear. No more `wait(5000)` dirty code that breaks in production.
 
-Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like recaptcha 
-Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
+Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like recaptcha challenges, generic captchas, clicking all the annoying pop ups that screw up your product because you didn't have the bot know to click them. Read the docs for a detailed description.
+
+Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0. 
 
  **Huge shoutout to original creator, mentor and friend, Juwan Yoo. It was an honor working with you. https://github.com/vhain**
  [Puppeteer docs] (https://pptr.dev/)
@@ -576,7 +577,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExNDIyOTkzMTUsNzY2NjcyOTkwLDEwNz
-c4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2
-MDM3MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbMjg2Mzk2NzQsNzY2NjcyOTkwLDEwNzc4Nj
+A5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3
+MjQsLTE5MTA3MjA0Ml19
 -->
