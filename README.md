@@ -3,7 +3,9 @@
 
 Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Theater makes your complex, difficult (common reasons: there is bot detection in place, it only works some of the time, how to keep consistent and detailed logs, having to constantly wait for a navigation promise, ...ad infinitum) challenges in web-scraping/automation much easier.
 
-In a sentence, Theater automates anything and everything a human being is capable of performing on a site. On the highest level, it achieves this by dealing with units of work as: Shows & Scenes (thus the name inspiration). A show might describe an entire site, like "Capital One". Within this show, your scenes play - for example: SignIn (for linking a user's capital one account using a bot), ExtractStatements (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does.
+In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.** On the highest level, it achieves this by dealing with units of work as: **Shows & Scenes**. 
+
+A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple 
 
 Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
 This is the principal dilemna theater solves and by extension makes developing puppeteer scripts much easier and more powerful. Theater allows developers to specify exact conditions visually apparent in the DOM (or not) and execute a particular puppeteer workflow as a result.
@@ -573,7 +575,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzY2NjcyOTkwLDEwNzc4NjA5MjAsLTE3MD
-g4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3
-MjA0Ml19
+eyJoaXN0b3J5IjpbNDkyMjk3NzkxLDc2NjY3Mjk5MCwxMDc3OD
+YwOTIwLC0xNzA4ODg5NjY1LC0xODkwMjExODE2LC0xMTU3NjAz
+NzI0LC0xOTEwNzIwNDJdfQ==
 -->
