@@ -19,7 +19,7 @@ Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0. 
 
 There is a lot of work to be done in terms of improving the matching process and contributions are welcome. This project is immature and should not be regarded as something to be used in a production environment without careful consideration.
 
-But seriously, the repo consists of a basic RESTful API interface to demonstrate how it works. My vision for the project is a distributed npm package that can be used to scaffold Shows & Scenes (like a CLI tool). 
+But seriously, the repo consists of a basic RESTful API interface to demonstrate how it works. My vision for the project is a distributed npm package that can be used to scaffold Shows & Scenes (like a CLI tool). Please reach out if you have experience in this area and want to help! 
 
 # # Base Classes
 
@@ -579,7 +579,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMzA5MzQ0Njg0LDExMDU5Mzg0MDMsNzY2Nj
+eyJoaXN0b3J5IjpbOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2Nj
 cyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4
 MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
