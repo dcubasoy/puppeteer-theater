@@ -12,7 +12,7 @@ This is a core value proposition  theater delivers on. By definition, there is n
 
 Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like recaptcha challenges, generic captchas, clicking all the annoying pop ups that screw up your product because you didn't have the bot know to click them. Read the docs for a detailed description.
 
-Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0. 
+Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0. Integration with selenium-webdriver is in process. 
 
  **Huge shoutout to original creator, mentor and friend, Juwan Yoo. It was an honor working with you. https://github.com/vhain**
  [Puppeteer docs] (https://pptr.dev/)
@@ -577,7 +577,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjg2Mzk2NzQsNzY2NjcyOTkwLDEwNzc4Nj
-A5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3
-MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbMTEwNTkzODQwMyw3NjY2NzI5OTAsMTA3Nz
+g2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMTE1NzYw
+MzcyNCwtMTkxMDcyMDQyXX0=
 -->
