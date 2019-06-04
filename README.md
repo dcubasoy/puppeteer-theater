@@ -8,8 +8,9 @@ In a sentence, **Theater automates anything and everything a human being is capa
 A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple! I am waiting on permission from Capital One to use this show as a demonstration. ❤️ Note: I cannot endorse violating any terms of use of anything legally speaking, but banks and other usual suspects are often good practice for seeing how well you can evade bot detection techniques. Or so I am told. 👮
 
 Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met? 
-This is a core value proposition  theater delivers on. By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manand by extension makes developing puppeteer scripts much easier and more powerful. Theater allows developers to specify exact conditions visually apparent in the DOM (or not) and execute a particular puppeteer workflow as a result.
+This is a core value proposition  theater delivers on. By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manually to appear. No more `wait(5000)` dirty code that breaks in production.
 
+Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like recaptcha 
 Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
 
  **Huge shoutout to original creator, mentor and friend, Juwan Yoo. It was an honor working with you. https://github.com/vhain**
@@ -575,7 +576,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwMjcwNDAzMDQsNzY2NjcyOTkwLDEwNz
+eyJoaXN0b3J5IjpbLTExNDIyOTkzMTUsNzY2NjcyOTkwLDEwNz
 c4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2
 MDM3MjQsLTE5MTA3MjA0Ml19
 -->
