@@ -5,10 +5,10 @@ Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Th
 
 In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.** On the highest level, it achieves this by dealing with units of work as: **Shows & Scenes**. 
 
-A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple! I am waiting on permission from Capital One to use this show as a demonstration. ❤️ Note: I cannot endorse violating any terms of use of anything legally speaking, but banks and usual suspects are often good practice for seeing how well you can evade bot detection techni
+A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple! I am waiting on permission from Capital One to use this show as a demonstration. ❤️ Note: I cannot endorse violating any terms of use of anything legally speaking, but banks and other usual suspects are often good practice for seeing how well you can evade bot detection techniques. Or so I am told. 👮
 
-Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
-This is the principal dilemna theater solves and by extension makes developing puppeteer scripts much easier and more powerful. Theater allows developers to specify exact conditions visually apparent in the DOM (or not) and execute a particular puppeteer workflow as a result.
+Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met? 
+This is a core value proposition  theater delivers on. By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manand by extension makes developing puppeteer scripts much easier and more powerful. Theater allows developers to specify exact conditions visually apparent in the DOM (or not) and execute a particular puppeteer workflow as a result.
 
 Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0.
 
@@ -575,7 +575,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTcyNDg1MzUxMyw3NjY2NzI5OTAsMTA3Nz
-g2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMTE1NzYw
-MzcyNCwtMTkxMDcyMDQyXX0=
+eyJoaXN0b3J5IjpbLTIwMjcwNDAzMDQsNzY2NjcyOTkwLDEwNz
+c4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2
+MDM3MjQsLTE5MTA3MjA0Ml19
 -->
