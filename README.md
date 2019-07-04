@@ -213,9 +213,9 @@ By default, this method will only call `extensions[].play()`. This is sort of co
 
 
 
-**elementQueries**: A series of selectors and conditionals that describe the state of the page that corresponds to the scene in which they lie. Basically encapsulates the state of the page. Is this popup blocking the viewport? Is the deposit button visible 
+**elementQueries**: A series of selectors and conditionals that describe the state of the page that corresponds to the scene in which they lie. 
 
-
+This basically encapsulates the state of the page. Is this popup blocking the viewport? Is the deposit button visible and did we set the context to contain the coins? ;) Note: For one use-case I am actually doing this deposit/refill balance flow using  [Puppeteer docs] (https://pptr.dev/);
 ```js
 query = {
   visibility: 'required'|'required:group-name'|'optional'|'forbidden',
@@ -577,7 +577,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyMDEzNDgxMTMsOTI1NzQzNTE1LDExMD
+eyJoaXN0b3J5IjpbLTE2NDc5OTM1OTksOTI1NzQzNTE1LDExMD
 U5Mzg0MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2
 NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml
 19
