@@ -1,9 +1,9 @@
 
 ##  Purpose & Inspiration
 
-Theater: a one of a kind bot-development platform powered by ES6 & puppeteer. Theater makes your complex, difficult (common reasons: there is bot detection in place, it only works some of the time, how to keep consistent and detailed logs, having to constantly wait for a navigation promise, ...ad infinitum) challenges in web-scraping/automation much easier.
+In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.**
 
-In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.** On the highest level, it achieves this by dealing with units of work as: **Shows & Scenes**. 
+ On the highest level, it achieves this by dealing with units of work as: **Shows & Scenes**. 
 
 A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple! I am waiting on permission from Capital One to use this show as a demonstration. ❤️ Note: I cannot endorse violating any terms of use of anything legally speaking, but banks and other usual suspects are often good practice for seeing how well you can evade bot detection techniques. Or so I am told. 👮
 
@@ -314,7 +314,7 @@ This object (**elementQueries**) will be unique to a particular scene, when the 
 ####  element.tableContent()
 
 - returns table as an array of JSON objects (`good` for scraping)
-- returns: <[Promise]<[Array]<Object>]>>
+- params: 
 
 ####  element.eval(fn, ...args)
 
@@ -579,7 +579,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2Nj
-cyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4
-MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbLTkzNjk3NjkyOSw5MjU3NDM1MTUsMTEwNT
+kzODQwMyw3NjY2NzI5OTAsMTA3Nzg2MDkyMCwtMTcwODg4OTY2
+NSwtMTg5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX
+0=
 -->
