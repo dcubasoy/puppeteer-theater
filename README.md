@@ -203,9 +203,7 @@ Check if `scene` finished playing; curtain fallen:
 
 - returns: <[Promise]>
 
-
-
-By default, this method will only call `extensions[].play()`.
+By default, this method will only call `extensions[].play()`. This is sort of confusing because it means if you are performing some work that needs to precede logic in `play()`, you need to  be invoking the constructor `await super.play()`  before you do your thing. Perfect example (found in the e
 
 
 
@@ -579,7 +577,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTkzNjk3NjkyOSw5MjU3NDM1MTUsMTEwNT
+eyJoaXN0b3J5IjpbLTE5Mzc2NDk1MSw5MjU3NDM1MTUsMTEwNT
 kzODQwMyw3NjY2NzI5OTAsMTA3Nzg2MDkyMCwtMTcwODg4OTY2
 NSwtMTg5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX
 0=
