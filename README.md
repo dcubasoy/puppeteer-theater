@@ -215,7 +215,7 @@ By default, this method will only call `extensions[].play()`. This is sort of co
 
 **elementQueries**: A series of selectors and conditionals that describe the state of the page that corresponds to the scene in which they lie. 
 
-This basically encapsulates the state of the page. Is this popup blocking the viewport? Is the deposit button visible and did we set the context to contain the coins? ;) Note: For one use-case I am actually doing this deposit/refill balance flow using  [Puppeteer docs] (https://pptr.dev/);
+This basically encapsulates the state of the page. Is this popup blocking the viewport? Is the deposit button visible and did we set the context to contain the coins?  For one use-case I am actually doing this deposit/refill balance flow using  [bitcoinjs-lib] ([https://www.npmjs.com/package/bitcoinjs-lib](https://www.npmjs.com/package/bitcoinjs-lib)). 
 ```js
 query = {
   visibility: 'required'|'required:group-name'|'optional'|'forbidden',
@@ -224,9 +224,8 @@ query = {
 }
 ```
 
-
-
 This object (**elementQueries**) will be unique to a particular scene, when the scene is constructed it will target the results and map them into PuppeteerBotElement(s).
+
 
 
 
@@ -577,8 +576,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE2NDc5OTM1OTksOTI1NzQzNTE1LDExMD
-U5Mzg0MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2
-NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml
-19
+eyJoaXN0b3J5IjpbNzgwNTI4ODkyLDkyNTc0MzUxNSwxMTA1OT
+M4NDAzLDc2NjY3Mjk5MCwxMDc3ODYwOTIwLC0xNzA4ODg5NjY1
+LC0xODkwMjExODE2LC0xMTU3NjAzNzI0LC0xOTEwNzIwNDJdfQ
+==
 -->
