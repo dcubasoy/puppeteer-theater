@@ -1,6 +1,9 @@
+/* eslint-disable no-await-in-loop */
 const assert = require('assert');
 const _ = require('lodash');
-const PromiseCondition = require('./promise-condition');
+const PromiseCondition = require('../../utils/promise-condition');
+
+const wait = t => new Promise(r => setTimeout(r, t));
 
 // Simply click all elements
 class Click {
@@ -43,6 +46,31 @@ class Delay {
   }
 }
 
+// Simply scrolls
+class Scroll {
+  constructor(ms = _.random(10000, 15000), repeats = 5) {
+    this.ms = ms;
+    this.scrollRepeat = repeats;
+  }
+
+  async play() {
+    this.scene.log('Extensions.Scroll:', 'Scrolling:', this.ms);
+
+    // re-release bot
+    const bot = await this.scene.show.bot();
+    let previousHeight;
+
+    for (let i = 0; i < this.scrollRepeat; i += 1) {
+      previousHeight = await bot.page.evaluate('document.body.scrollHeight');
+      // eslint-disable-next-line no-await-in-loop
+      await bot.page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
+      // eslint-disable-next-line no-await-in-loop
+      await bot.page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
+      // eslint-disable-next-line no-await-in-loop
+      await bot.page.waitFor(this.ms);
+    }
+  }
+}
 
 // Fork. like depth menu
 class Fork {
@@ -144,7 +172,6 @@ class ReCAPTCHAv2 {
     // re-release bot
     const bot = await this.scene.show.bot();
 
-    // eslint-disable-next-line max-len
     const websiteKey = element ? await element.eval(this.siteKeyFn) : await bot.page.evaluate(this.siteKeyFn);
     this.scene.log('Extensions.ReCAPTCHAv2:', 'websiteKey:', websiteKey);
 
@@ -161,13 +188,88 @@ class ReCAPTCHAv2 {
       .map(e => e.querySelector('#g-recaptcha-response'))
       .forEach((e) => {
         e.value = captchaResponse;
+        e.innerText = captchaResponse;
       }), gRecaptchaResponse);
-
-    // todo: check for iframe, if iframe present, eval in seperate frame
   }
 }
 
-//  Captcha
+// Generic Login Flow
+class Login {
+  constructor(usernameElementName, passwordElementName, targetCaptchaElementName, targetCaptchaAnswerElement, confirmationElementName, loginBtnElementName, captchaAttempts = 50) {
+    this.usernameElementName = usernameElementName;
+    this.passwordElementName = passwordElementName;
+    assert(this.usernameElementName, 'usernameElementName undefined');
+    assert(this.passwordElementName, 'passwordElementName undefined');
+
+    this.captchaAttempts = this.captchaAttempts;
+    this.targetCaptchaElementName = targetCaptchaElementName;
+    this.targetCaptchaAnswerElement = targetCaptchaAnswerElement;
+    assert(this.targetCaptchaElementName, 'targetCaptchaElementName undefined');
+    assert(this.targetCaptchaAnswerElement, 'targetCaptchaAnswerElement undefined');
+
+    this.loginBtnElementName = loginBtnElementName;
+    this.confirmationElementName = confirmationElementName;
+    assert(this.loginBtnElementName, 'loginBtnElementName undefined');
+    assert(this.confirmationElementName, 'confirmationElementName undefined');
+  }
+
+  async match() {
+    const bot = await this.scene.show.bot();
+
+    const usernameElementName = this.scene.elements[this.usernameElementName];
+    const passwordElementName = this.scene.elements[this.passwordElementName];
+    const targetCaptchaElementName = this.scene.elements[this.targetCaptchaElementName];
+    const loginBtnElementName = this.scene.elements[this.loginBtnElementName];
+
+    // eslint-disable-next-line consistent-return
+    this.internalBot.page.on('request', async (request) => {
+      if (request.isNavigationRequest()) return false;
+    });
+
+    return !(!await usernameElementName.visible() || !await passwordElementName.visible() || !await targetCaptchaElementName.visible() || !await loginBtnElementName.visible());
+  }
+
+  async play() {
+    const usernameElementName = this.scene.elements[this.usernameElementName];
+    const passwordElementName = this.scene.elements[this.passwordElementName];
+
+    const targetCaptchaElementName = this.scene.elements[this.targetCaptchaElementName];
+    const targetCaptchaAnswerElementName = this.scene.elements[this.targetCaptchaAnswerElementName];
+
+    const loginBtnElementName = this.scene.elements[this.loginBtnElementName];
+    const confirmationElementName = this.scene.elements[this.confirmationElementName]; //  TODO: replace with function to be evaluated
+
+    // re-release bot
+    const bot = await this.scene.show.bot();
+
+    do {
+      await usernameElementName.fill(this.scene.show.context('username') || this.scene.show.context('tempUsername'));
+      await passwordElementName.fill(this.scene.show.context('password') || this.scene.show.context('tempPassword'));
+
+      // now solve captcha
+      // TODO: add flag for captcha type
+
+      const captchaBody = await targetCaptchaElementName.screenshot();
+      const code = await bot.resolveCaptcha(captchaBody);
+      this.scene.log('Extensions.Login:', 'Captcha Response', code);
+
+      await targetCaptchaAnswerElementName.fill(code);
+
+      await loginBtnElementName.click();
+      this.scene.log('Extensions.Login:', 'Captcha Attempt #:', parseInt(this.captchaAttempts, 10));
+
+      await bot.page.waitFor(5000);
+      if (await this.confirmationElementName.visible()) {
+        this.scene.log('Extensions.Login:', 'Linked! Login successful.');
+        this.scene.show.emit('botLoginResult', { status: 'Linked' });
+        break;
+      }
+
+    } while (PromiseCondition.not(confirmationElementName.visible()));
+  }
+}
+
+
 class Captcha {
   constructor(targetElementName, targetAnswerElementName) {
     this.targetElementName = targetElementName;
@@ -179,7 +281,7 @@ class Captcha {
   async match() {
     const element = this.scene.elements[this.targetElementName];
     const targetElement = this.scene.elements[this.targetAnswerElement];
-    if (!await element.visible() && !await targetElement.visible()) return false;
+    if (!await element.visible() || !await targetElement.visible()) return false;
     return true;
   }
 
@@ -187,13 +289,12 @@ class Captcha {
     const captchaElement = this.scene.elements[this.targetElementName];
     const answerElement = this.scene.elements[this.targetAnswerElement];
 
-    // re-release bot
     const bot = await this.scene.show.bot();
 
     const captchaBody = await captchaElement.screenshot();
-    const code = await bot.resolveCaptcha(Buffer.from(captchaBody, 'base64'));
+    const code = await bot.resolveCaptcha(captchaBody);
 
-    this.scene.log('Extensions.Captcha:', 'Captcha Response:', code);
+    this.scene.log('Extensions.Captcha:', 'Captcha:', code);
     await answerElement.fill(code);
   }
 }
@@ -202,8 +303,10 @@ class Captcha {
 module.exports = {
   Click,
   Delay,
+  Scroll,
   Fork,
   PreventCurtainFall,
   ReCAPTCHAv2,
   Captcha,
+  Login,
 };
