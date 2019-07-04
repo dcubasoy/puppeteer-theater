@@ -203,7 +203,7 @@ Check if `scene` finished playing; curtain fallen:
 
 - returns: <[Promise]>
 
-By default, this method will only call `extensions[].play()`. This is sort of confusing because it means if you are performing some work that needs to precede logic in `play()`, you need to  be invoking the constructor `await super.play()`  before you do your thing. Perfect example (found in the e
+By default, this method will only call `extensions[].play()`. This is sort of confusing because it means if you are performing some work that needs to precede logic in `play()`, you need to  be invoking the constructor `await super.play()`  before you do your thing. Perfect example (found in the example shows) is captcha authentication. See the Docs.MD file for a detailed and complete reference.
 
 
 
@@ -213,7 +213,7 @@ By default, this method will only call `extensions[].play()`. This is sort of co
 
 
 
-**elementQueries**: A series of selectors and conditionals that describe the state of the page that corresponds to the scene in which they lie.
+**elementQueries**: A series of selectors and conditionals that describe the state of the page that corresponds to the scene in which they lie. Basically encapsulates the state of the page. Is this popup blocking the viewport? Is the deposit button visible 
 
 
 ```js
@@ -577,8 +577,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE5Mzc2NDk1MSw5MjU3NDM1MTUsMTEwNT
-kzODQwMyw3NjY2NzI5OTAsMTA3Nzg2MDkyMCwtMTcwODg4OTY2
-NSwtMTg5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX
-0=
+eyJoaXN0b3J5IjpbLTEyMDEzNDgxMTMsOTI1NzQzNTE1LDExMD
+U5Mzg0MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2
+NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml
+19
 -->
