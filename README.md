@@ -226,6 +226,7 @@ query = {
 
 This object (**elementQueries**) will be unique to a particular scene, when the scene is constructed it will target the results and map them into PuppeteerBotElement(s).
 
+- Don't mispell anything - your code will failure and you will spend hours tracking down the visblity that blocked you from proceeding.
 
 
 
@@ -576,7 +577,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzgwNTI4ODkyLDkyNTc0MzUxNSwxMTA1OT
+eyJoaXN0b3J5IjpbNjQxOTQxMjI3LDkyNTc0MzUxNSwxMTA1OT
 M4NDAzLDc2NjY3Mjk5MCwxMDc3ODYwOTIwLC0xNzA4ODg5NjY1
 LC0xODkwMjExODE2LC0xMTU3NjAzNzI0LC0xOTEwNzIwNDJdfQ
 ==
