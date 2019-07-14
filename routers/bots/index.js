@@ -2,14 +2,39 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs-extra');
 const express = require('express');
+const logger = require('./logger');
+
 
 const router = express.Router();
 
 const BOTS = (() => fs.readdirSync(path.join(__dirname, './bots'))
-  .filter(n => /^[a-z-0-9]+\.js$/.test(n))
-  // eslint-disable-next-line global-require, import/no-dynamic-require
-  .map(n => require(path.join(__dirname, 'bots', n)))
-  .reduce((p, c) => { p[c.name] = c; return p; }, {}))();
+  .filter(n => /^[a-z-0-9]+\.js$/.test(n)).map(n => {
+  return require(path.join(__dirname, 'bots', n));
+}).reduce((p, c) => { p[c.name] = c; return p; }, {}))();
+
+
+async function processScreenshots(screenshots) {
+  if (!screenshots) return [];
+  return (await Promise.all(screenshots.map(async (s) => {
+    try {
+      return await sharp(s)
+        .resize(600)
+        .background('white')
+        .withoutEnlargement()
+        .png()
+        .toBuffer();
+    } catch (err) {
+      logger.error('failed resizing buffer');
+      return s;
+    }
+  }))).map((s, i) => ({
+    buffer: s.toString('base64'),
+    name: `ss_${i}.png`,
+    mime: 'image/png',
+  }));
+}
+
+
 
 router.get('/run', async (req, res, next) => {
   try {
@@ -91,6 +116,7 @@ Object.keys(BOTS).forEach((botName) => {
   router.use(`/${botName}`, bot.router);
 
   bot.router.post('/run', bodyParser.json({ limit: '20mB' }), async (req, res, next) => {
+    logger.info()
     req.setTimeout(60 * 1000 * 60);
     try {
       const result = await bot.run(req.body);

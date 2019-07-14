@@ -5,7 +5,11 @@ const PromiseCondition = require('./promise-condition');
 
 const wait = t => new Promise(r => setTimeout(r, t));
 
-// Simply click all elements
+/**
+ * @description Simply clicks all elements matching the given PuppteerBotElementQuery.
+ *
+ * @class Click
+ */
 class Click {
   constructor(arg = {}) {
     if (typeof arg === 'string') {
@@ -16,6 +20,12 @@ class Click {
     }
   }
 
+  /**
+   * @description Checks for element visibility / forbidden attribute / once = true for clicking only the first element.
+   *
+   *
+   * @memberOf Click
+   */
   async play() {
     const elementNames = Object.keys(this.scene.elements);
     for (let i = 0; i < elementNames.length; i += 1) {
@@ -34,7 +44,12 @@ class Click {
   }
 }
 
-// Simply gives specified delay (optional)
+
+/**
+ * @description Simply gives specified delay (Defaults: random number between 2000, 7500). Helpful for testing and bot detection evasion. :)
+ *
+ * @class Delay
+ */
 class Delay {
   constructor(ms = _.random(2000, 7500)) {
     this.ms = ms;
@@ -46,7 +61,11 @@ class Delay {
   }
 }
 
-// Simply scrolls
+/**
+ * @description Simply Scrolls for the given time (in ms), and repeats scrollRepeats (default = 5) times. Designed for infinite scrolling scenarios.
+ *
+ * @class Scroll
+ */
 class Scroll {
   constructor(ms = _.random(10000, 15000), repeats = 5) {
     this.ms = ms;
@@ -72,7 +91,12 @@ class Scroll {
   }
 }
 
-// Fork. like depth menu
+
+/**
+ * @description Fork. Its like a depth menu.
+ *
+ * @class Fork
+ */
 class Fork {
   constructor(forks) {
     this.forks = forks;
@@ -127,7 +151,11 @@ class Fork {
   }
 }
 
-// Make this scene persists
+/**
+ * @description Make this scene prevent the show's curtain from falling (for playCount = n = 1 = default) times. (important concept that is not obvious until you understand the purpose of theater)
+ *
+ * @class PreventCurtainFall
+ */
 class PreventCurtainFall {
   constructor({ playCount = 1 }) {
     this.playCount = playCount;
@@ -144,7 +172,13 @@ class PreventCurtainFall {
   }
 }
 
-// reCAPTCHA v2
+
+/**
+ * @description Generic extension for solving Google ReCaptcha V2 challenges.
+ // TODO: Add support for new nested iframes & callbacks.
+ *
+ * @class ReCAPTCHAv2
+ */
 class ReCAPTCHAv2 {
   constructor(targetElementName, siteKeyFn) {
     this.targetElementName = targetElementName;
@@ -193,7 +227,12 @@ class ReCAPTCHAv2 {
   }
 }
 
-// Generic Login Flow
+
+/**
+ * @description Model for a generic login/authentication flow where username, password, captcha, are present and there exists a confirmation element you can rely on to indicate authentication succesful when this element is visible.
+ *
+ * @class Login
+ */
 class Login {
   constructor(usernameElementName, passwordElementName, targetCaptchaElementName, targetCaptchaAnswerElement, confirmationElementName, loginBtnElementName, captchaAttempts = 50) {
     this.usernameElementName = usernameElementName;
@@ -264,6 +303,11 @@ class Login {
 }
 
 
+/**
+ * @description Extension for solving generic captcha challenge (ImageToText). `puppeteer-bot` internally suppports: `anti-captcha` and `2captcha`.
+ *
+ * @class Captcha
+ */
 class Captcha {
   constructor(targetElementName, targetAnswerElementName) {
     this.targetElementName = targetElementName;

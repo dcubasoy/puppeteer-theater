@@ -1,9 +1,14 @@
+## Updates: 07/14/2016
+
+- Added JSDoc for everything!
+- Generated new API documentation using an automated tool (thankfully...)
+- Added some issues/improvements I'd like to see made in the project
+- Added: 4 Shows to demonstrate a use-case where theater could be / was used for a very interesting purpose. Aiming to submit a whitepaper before next DEFCON, but the smart ones can figure it out for yourself.
+
+Upload to S3: Bucket name is defined by: `process.env.S3_BUCKET_PREFIX-theater-logs`
+Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theater-logs`
 
 
-## UPDATES
-
-Upload to S3: Bucket name is defined by: `process.env.BUCKET_PREFIX-theater-logs`
-Upload to Firebase/Google Cloud Storage: Bucket name is now d
 ##  Purpose & Inspiration
 
 In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.**
@@ -12,19 +17,37 @@ In a sentence, **Theater automates anything and everything a human being is capa
 
 A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple! I am waiting on permission from Capital One to use this show as a demonstration. ❤️ Note: I cannot endorse violating any terms of use of anything legally speaking, but banks and other usual suspects are often good practice for seeing how well you can evade bot detection techniques. Or so I am told. 👮
 
-Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
-This is a core value proposition  theater delivers on. By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manually to appear. No more `wait(5000)` dirty code that breaks in production.
+Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().`
 
-Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like recaptcha challenges, generic captchas, clicking all the annoying pop ups that screw up your product because you didn't have the bot know to click them. Read the docs for a detailed description.
+What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
 
-Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0. Integration with selenium-webdriver is in process.
+This is a core value proposition theater offers.
 
- **Huge shoutout to original creator, mentor and friend, Juwan Yoo. It was an honor working with you. https://github.com/vhain**
+By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manually to appear. No more `wait(5000)` dirty code that breaks in production due to network changes or any numberof factors.
+
+Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like
+1) recaptcha challenges
+2) generic captchas
+3) clicking all the annoying pop ups that screw up your automation (`.spinner`)
+
+Read the docs for a detailed description.
+
+Tested & Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0. Integration with selenium-webdriver is in process.
+
  [Puppeteer docs] (https://pptr.dev/)
+ [MDN docs] (https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-There is a lot of work to be done in terms of improving the matching process and contributions are welcome. This project is immature and should not be regarded as something to be used in a production environment without careful consideration.
+The repo is just a basic RESTful API for you to execute bots and understand how the framework operates internally. To that end, you'll want to make sure to:
+`export DEBUG=theater*`
 
-But seriously, the repo consists of a basic RESTful API interface to demonstrate how it works. My vision for the project is a distributed npm package that can be used to scaffold Shows & Scenes (like a CLI tool). Please reach out if you have experience in this area and want to help!
+### How to just rip and run?
+
+
+- Clone the repo
+- nvm use 10.5.3 (install if not present)
+- npm install
+
+`export DEBUG=theater*`
 
 # # Base Classes
 

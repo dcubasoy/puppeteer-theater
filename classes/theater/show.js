@@ -192,6 +192,14 @@ class Show extends EventEmitter {
     return scene;
   }
 
+  /**
+   * @description Play's the show, iterating through the resulting scenes looking for a match. Optional: Specify an IntialScene, and UntilScene to restrict bot operation.
+   *
+   * @param {any} [{ InitialScene, UntilScene }={}]
+   * @returns
+   *
+   * @memberOf Show
+   */
   async play({ InitialScene, UntilScene } = {}) {
     this.emit('showStartPlay', await this.result());
 
