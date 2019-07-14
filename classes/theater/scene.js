@@ -4,6 +4,16 @@ const SceneExtensions = require('./scene-extensions');
 const PromiseCondition = require('./promise-condition');
 const PuppeteerBotElement = require('./puppeteer-bot-element');
 
+
+
+/**
+ * @description * Loads all .scene.js files in current directory that describe page context/state using {PuppeteerBotElement} queries.
+ * @constructor
+- `show` <[Show]>
+- `elementQueries` <[Object]<[string], [PuppeteerBotElement]>>
+- `extensions` <[Array]<[SceneExtensions]>>
+- `generic` <[boolean]> If this value sets to `true`, "curtain" will never fall. Default = true.
+ */
 class Scene {
   constructor({
     show,
@@ -48,27 +58,60 @@ class Scene {
     return Object.values(this.continuousPlayLimits).reduce((p, c) => p + c, 0);
   }
 
+  /**
+   * @description Sets limit for particular element (ex. banner) to continue to be seen/that scene to be played.
+   *
+   * @param {any} key
+   * @param {any} count
+   *
+   * @memberOf Scene
+   */
   setContinousPlayLimit(key, count) {
     this.continuousPlayLimits[key] = Math.max(this.continuousPlayLimits[key] || 0, count);
   }
 
+  /**
+   * @description Interface for interactive bot via redis.
+   *
+   * @returns
+   *
+   * @memberOf Scene
+   */
   interaction() {
     const { show: { internalBot: { interaction } = {} } = {} } = this;
     if (!interaction) {
-      throw new Error('InteractionDown');
+      this.log('Interaction Down!');
     }
     return interaction;
   }
 
+  /**
+   * @description Returns context for given key.
+   * @param {any} key: string
+   * @returns: {any} value
+   */
   context(key) {
     return this.show.context(key);
   }
 
+
+/**
+ * @description: Sets context for show.
+ * @param {key} {string}
+ * @param {value} {any}
+ */
   setContext(key, value) {
     this.log('setContext key:', key, 'value:', value);
     return this.show.setContext(key, value);
   }
 
+/**
+* @description Checks:
+1. Curtain has not yet fallen
+2. All `PuppeteerBotElement` queries validated.
+3. All `extensions[].match()` all returned `true`
+* @returns Promise<Boolean>
+*/
   async match() {
     const matchContext = {};
     const matches = await Promise.all(Object.values(this.elements)
@@ -82,7 +125,13 @@ class Scene {
     );
   }
 
-  // eslint-disable-next-line class-methods-use-this
+/**
+* @description Checks:
+1. Check if `scene` finished playing; curtain fallen:
+2. - NOT `generic` scene and
+3. - none of `extensions[].curtainFallen()`
+* @returns Promise<Boolean>
+*/
   async curtainFallen() {
     // generic scene must always go on
     if (this.generic) return false;
@@ -91,6 +140,10 @@ class Scene {
     );
   }
 
+/**
+* @description By default, this method will only `extensions[].play()`.
+* @returns Promise<Boolean>
+*/
   async play() {
     try {
       const playableExensions = this.extensions.filter(e => e.play);

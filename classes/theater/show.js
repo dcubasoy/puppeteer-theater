@@ -68,18 +68,26 @@ async function constancy(fn, count = 3, delay = 100) {
   return result;
 }
 
+/**
+ * @description * Foundation for Theater design-patterns, event-driven execution flow | extends: [`EventEmitter`](https://nodejs.org/api/events.html#events_class_eventsemitter)
+ * @constructor
+ 1. An array of `Scene` that might play. If not specified, all the available `Scene`s will be listed.
+ 2. bot: Internal bot (puppeteer-wrapper) upon which show will play.
+ 3. timeout: Time for `Show` to give up matching `Scene` (ms). Defaults to 30000.
+ 4. logger: Custom winston logger instance
+ * @extends {EventEmitter}
+ */
 class Show extends EventEmitter {
   constructor({
     Scenes = [],
     bot,
     logger,
-    timeout = 2 * 60 * 1000,
+    timeout = 5 * 60 * 1000,
   } = {}) {
     super();
 
     this.ref = shortid.generate();
-    // eslint-disable-next-line no-console
-    this.logger = logger || console.log;
+    this.logger = logger;
     this.ctx = {};
     this.Scenes = Scenes || Object.values(this.constructor.Scenes) || [];
     this.Scenes.forEach((S, i) => assert(S.prototype instanceof Scene, `Scenes[${i}] ${S.name} is not valid Scene`));
@@ -90,6 +98,7 @@ class Show extends EventEmitter {
   }
 
   async bot() {
+    // TODO: Implement responsive health-check when invoking this function.
     return this.internalBot;
   }
 
@@ -106,12 +115,27 @@ class Show extends EventEmitter {
     return this.ctx[key];
   }
 
+  /**
+   * @description Sets context for the Show.
+   *
+   * @param {any} key
+   * @param {any} value
+   *
+   * @memberOf Show
+   */
   setContext(key, value) {
     if (this.ctx[key] === value) return;
     this.ctx[key] = value;
     debug('setting context', { key });
   }
 
+  /**
+   * @description Returns the result when show has finished playing.
+   *
+   * @returns {Promise<Show.Result>}
+   *
+   * @memberOf Show
+   */
   async result() {
     return {
       package: `${packageJson.name}@${packageJson.version}`,
@@ -120,6 +144,14 @@ class Show extends EventEmitter {
     };
   }
 
+  /**
+   * @description Targets matched scene found by matching context or by pasing `TargetScene` directly.
+   *
+   * @param {any} TargetScene
+   * @returns
+   *
+   * @memberOf Show
+   */
   async scene(TargetScene) {
     if (TargetScene) {
       return this.scenes.find(s => s.constructor === TargetScene);
@@ -143,6 +175,14 @@ class Show extends EventEmitter {
     });
   }
 
+  /**
+   * @description Plays the given scene once.
+   *
+   * @param {Scene} scene
+   * @returns
+   *
+   * @memberOf Show
+   */
   async playOnce(s) {
     const bot = await this.bot();
     if (bot && (!bot.page || !bot.browser)) {
@@ -196,7 +236,7 @@ class Show extends EventEmitter {
    * @description Play's the show, iterating through the resulting scenes looking for a match. Optional: Specify an IntialScene, and UntilScene to restrict bot operation.
    *
    * @param {any} [{ InitialScene, UntilScene }={}]
-   * @returns
+   * @returns {any} TBD
    *
    * @memberOf Show
    */
