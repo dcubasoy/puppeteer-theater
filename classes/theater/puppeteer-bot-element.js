@@ -4,6 +4,7 @@ const fs = require('fs');
 const util = require('util');
 const _ = require('lodash');
 const tabletojson = require('tabletojson');
+const debug = require('debug')('theater:puppeteer-bot-element');
 
 const fsWrite = util.promisify(fs.write);
 const fsClose = util.promisify(fs.close);
@@ -28,7 +29,7 @@ class PuppeteerBotElement {
       try {
         visibleElements = await (await this.show.bot()).$$(this.query.selector, this.query.includeInvisible);
       } catch (error) {
-        // ignore error
+        console.trace(error);
       }
     }
 
@@ -77,7 +78,6 @@ class PuppeteerBotElement {
     return (await this.show.bot()).page.select(this.query.selector, ...value);
   }
 
-  // eslint-disable-next-line consistent-return
   async $select(opt) {
     if (!opt) {
       this.scene.log('Element:', this.query.selector, 'select-empty');
@@ -125,6 +125,14 @@ class PuppeteerBotElement {
     }
   }
 
+  /**
+   * @description : Returns a Promise<Boolean> indciating whether the given scene has matched or not.
+   *
+   * @param {any} matchContext
+   * @returns
+   *
+   * @memberOf PuppeteerBotElement
+   */
   async match(matchContext) {
     if (this.query.visibility === 'optional') return true;
     if (/^required:/.test(this.query.visibility)) {
@@ -137,17 +145,42 @@ class PuppeteerBotElement {
     return ((await this.visible()) ^ (this.query.visibility === 'required')) === 0;
   }
 
-  async tableContent(opts) {
+
+  /**
+   * @description Extracts table content as an array of (potentially) nested JSON objects.
+   *
+   * @param {boolean} [args={ stripHtml = true }] For specifying arguments to tabletojson.convert().
+   * @returns
+   *
+   * @memberOf PuppeteerBotElement
+   */
+  async tableContent(args = { stripHtml = true }) {
     const els = await this.visibleElementHandles();
-    const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).outerHTML || '').trim(), el)));
-    const content = strs.filter(s => !!s).join('\n');
-    return tabletojson.convert(content);
+    let content = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).outerHTML || '').trim(), el)));
+    content = content.filter(s => !!s).join('\n');
+    return tabletojson.convert(content, args);
   }
 
+
+  /**
+   * @description Returns array [] of Node element attributes 'textContent'
+   *
+   * @returns {Array<string>}
+   *
+   * @memberOf PuppeteerBotElement
+   */
   async textContents() {
-    return this.tableContent({ asArray: true });
+    return this.textContent({ asArray: true });
   }
 
+
+   /**
+   * @description Returns new-line delimited string (rather than array) of every node in DOM's attribute `textContent`
+   *
+   * @returns {Array<string>}
+   *
+   * @memberOf PuppeteerBotElement
+   */
   async textContent({ asArray = false } = {}) {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).textContent || '').trim(), el)));
@@ -157,6 +190,14 @@ class PuppeteerBotElement {
     return strs.filter(s => !!s).join('\n');
   }
 
+  /**
+   * @description Returns new-line delimited string (rather than array) of every node in DOM's attribute `innerText`
+   *
+   * @param {any} [{ asArray = false }={}]
+   * @returns
+   *
+   * @memberOf PuppeteerBotElement
+   */
   async innerText({ asArray = false } = {}) {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).innerText || '').trim(), el)));
@@ -166,6 +207,13 @@ class PuppeteerBotElement {
     return strs.filter(s => !!s).join('\n');
   }
 
+  /**
+   * @description Returns new-line delimited string (rather than array) of every node in DOM's attribute `innerText`
+   *
+   * @returns
+   *
+   * @memberOf PuppeteerBotElement
+   */
   async innerTexts() {
     return this.innerText({ asArray: true });
   }
@@ -233,6 +281,7 @@ class PuppeteerBotElement {
     return worked;
   }
 
+
   async value() {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).value || '').trim(), el)));
@@ -245,16 +294,9 @@ class PuppeteerBotElement {
     return strs;
   }
 
-  async attribute(opt) {
-    const els = await this.visibleElementHandles();
-    const attrs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => e.getAttribute(opt), el)));
-    return attrs.filter(s => !!s)[0] || (els.length > 0 ? '' : undefined);
-  }
-
-
   async screenshot() {
     const els = await this.visibleElementHandles();
-    return els[0].screenshot({ encoding: 'base64' });
+    return els[0].screenshot();
   }
 
   async eval(func, ...args) {

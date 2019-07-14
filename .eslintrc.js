@@ -6,8 +6,9 @@ module.exports = {
   "rules": {
     "no-bitwise": ["error", { "allow": ["~"] }],
     "no-underscore-dangle": ["error", { "allowAfterThis": true, "allowAfterSuper": true }],
+    "no-restricted-properties": false,
   },
   "globals": {
-    "document": true
+    "document": true,
   },
 };

@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const assert = require('assert');
 const _ = require('lodash');
-const PromiseCondition = require('../../utils/promise-condition');
+const PromiseCondition = require('./promise-condition');
 
 const wait = t => new Promise(r => setTimeout(r, t));
 
@@ -259,12 +259,6 @@ class Login {
       this.scene.log('Extensions.Login:', 'Captcha Attempt #:', parseInt(this.captchaAttempts, 10));
 
       await bot.page.waitFor(5000);
-      if (await this.confirmationElementName.visible()) {
-        this.scene.log('Extensions.Login:', 'Linked! Login successful.');
-        this.scene.show.emit('botLoginResult', { status: 'Linked' });
-        break;
-      }
-
     } while (PromiseCondition.not(confirmationElementName.visible()));
   }
 }

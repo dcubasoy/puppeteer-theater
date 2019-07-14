@@ -1,25 +1,30 @@
 
+
+## UPDATES
+
+Upload to S3: Bucket name is defined by: `process.env.BUCKET_PREFIX-theater-logs`
+Upload to Firebase/Google Cloud Storage: Bucket name is now d
 ##  Purpose & Inspiration
 
 In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.**
 
- On the highest level, it achieves this by dealing with units of work as: **Shows & Scenes**. 
+ On the highest level, it achieves this by dealing with units of work as: **Shows & Scenes**.
 
 A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple! I am waiting on permission from Capital One to use this show as a demonstration. ❤️ Note: I cannot endorse violating any terms of use of anything legally speaking, but banks and other usual suspects are often good practice for seeing how well you can evade bot detection techniques. Or so I am told. 👮
 
-Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met? 
+Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().` What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
 This is a core value proposition  theater delivers on. By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manually to appear. No more `wait(5000)` dirty code that breaks in production.
 
 Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like recaptcha challenges, generic captchas, clicking all the annoying pop ups that screw up your product because you didn't have the bot know to click them. Read the docs for a detailed description.
 
-Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0. Integration with selenium-webdriver is in process. 
+Tested & Fully Compatible with both puppeteer@1.17.0 & puppeteer-firefox@0.5.0. Integration with selenium-webdriver is in process.
 
  **Huge shoutout to original creator, mentor and friend, Juwan Yoo. It was an honor working with you. https://github.com/vhain**
  [Puppeteer docs] (https://pptr.dev/)
 
 There is a lot of work to be done in terms of improving the matching process and contributions are welcome. This project is immature and should not be regarded as something to be used in a production environment without careful consideration.
 
-But seriously, the repo consists of a basic RESTful API interface to demonstrate how it works. My vision for the project is a distributed npm package that can be used to scaffold Shows & Scenes (like a CLI tool). Please reach out if you have experience in this area and want to help! 
+But seriously, the repo consists of a basic RESTful API interface to demonstrate how it works. My vision for the project is a distributed npm package that can be used to scaffold Shows & Scenes (like a CLI tool). Please reach out if you have experience in this area and want to help!
 
 # # Base Classes
 
@@ -213,9 +218,9 @@ By default, this method will only call `extensions[].play()`. This is sort of co
 
 
 
-**elementQueries**: A series of selectors and conditionals that describe the state of the page that corresponds to the scene in which they lie. 
+**elementQueries**: A series of selectors and conditionals that describe the state of the page that corresponds to the scene in which they lie.
 
-This basically encapsulates the state of the page. Is this popup blocking the viewport? Is the deposit button visible and did we set the context to contain the coins?  For one use-case I am actually doing this deposit/refill balance flow using  [bitcoinjs-lib] ([https://www.npmjs.com/package/bitcoinjs-lib](https://www.npmjs.com/package/bitcoinjs-lib)). 
+This basically encapsulates the state of the page. Is this popup blocking the viewport? Is the deposit button visible and did we set the context to contain the coins?  For one use-case I am actually doing this deposit/refill balance flow using  [bitcoinjs-lib] ([https://www.npmjs.com/package/bitcoinjs-lib](https://www.npmjs.com/package/bitcoinjs-lib)).
 ```js
 query = {
   visibility: 'required'|'required:group-name'|'optional'|'forbidden',
@@ -312,7 +317,7 @@ This object (**elementQueries**) will be unique to a particular scene, when the 
 ####  element.tableContent()
 
 - returns table as an array of JSON objects (`good` for scraping)
-- params: 
+- params:
 
 ####  element.eval(fn, ...args)
 

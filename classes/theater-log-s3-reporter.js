@@ -3,6 +3,8 @@ const shortid = require('shortid');
 const assert = require('assert');
 const util = require('util');
 const Show = require('./theater/show');
+const logger = require('../utils/logger');
+
 
 const s3 = new AWS.S3();
 
@@ -10,7 +12,7 @@ class TheaterLogS3Reporter {
   constructor({
     show,
     bot,
-    bucket = 'theater-logs',
+    bucket = `${process.env.BUCKET_PREFIX}-theater-logs`,
     logger,
   }) {
     assert(show instanceof Show, 'emitter is not instance of Show');
@@ -18,15 +20,13 @@ class TheaterLogS3Reporter {
     this.startedAt = new Date();
     this.show = show;
     this.bot = bot;
+    this.logger = logger;
     this.userId = userId || shortid.v4();
     this.incrValue = 0;
     this.bucket = bucket;
-    this.logger = logger || console.log.bind(console);
-    this.userId = uuid.v4();
 
     this.botTasksCount = 0;
     this.botFreeResolves = [];
-
     this.lastScreenshot = null;
   }
 

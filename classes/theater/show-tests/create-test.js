@@ -35,7 +35,7 @@ async function runTests() {
     showTestGrep = new RegExp(process.env.SHOW_TEST_GREP, 'gi');
   }
 
-  await Promise.all(tests.map(throat(8, async ({ fn, setup }) => {
+  await Promise.all(tests.map(throat(12, async ({ fn, setup }) => {
     const testName = `${setup.Show.name}/${setup.name}`;
     if (showTestGrep && !showTestGrep.test(testName)) {
       process.stdout.write(`Test [${testName}]: skipping\n`);
@@ -48,6 +48,8 @@ async function runTests() {
     const bot = new PuppeteerBot({
       minWidth: 1280,
       minHeight: 1024,
+      disguiseFlags: ['--canvas'],
+      emulateFlag: 'mobile',
       preferNonHeadless: true,
     });
 

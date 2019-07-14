@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 /* eslint-disable no-console */
 /* eslint-disable max-len */
@@ -48,7 +50,7 @@ function uppercaseObjKeys(o) {
 }
 
 function getURLCacheKey() {
-  return `puppeteer-bot-2a-url-parsed-cache:${parseInt(Date.now() / 1000 / 60 / 60 / 6, 10)}:h`;
+  return `puppeteer-bot-url-parsed-cache:${parseInt(Date.now() / 1000 / 60 / 60 / 6, 10)}:h`;
 }
 
 async function puppeteerErrorRetry(fn) {
@@ -249,7 +251,6 @@ class PuppeteerBot {
     this.cleanUps = [];
     this.requestIds = [];
 
-    // eslint-disable-next-line no-console
     this.logger = logger || console.log.bind(console);
     this.label = label;
 
@@ -276,7 +277,7 @@ class PuppeteerBot {
     this.trustChromeNativeRequest = trustChromeNativeRequest;
 
     this.preferNonHeadless = preferNonHeadless;
-    this.disguiseFlags = disguiseFlags;
+    this.disguiseFlags = disguiseFlags; // NOTE: Deprecated temporarily (ALL flags are applied).
 
     this.revision = revision;
     this.executablePath = executablePath;
@@ -285,8 +286,13 @@ class PuppeteerBot {
     this.tor = torBrowsingEnabled;
   }
 
+
   /**
-   * Disguises page to evade bot detection strategies
+   * Masks puppeteer to simulate a truly unique user browser fingerprint. Extremely useful for evading bot detection measures.
+   */
+  /**
+   * @param  {} page: Puppeteer.page
+   * @param  {} browserContext: Default browser context
    */
   static async disguisePage(page, browserContext, {
     browserUniqueID = uuid.v4(),
@@ -298,6 +304,8 @@ class PuppeteerBot {
     geolocation,
   } = {}) {
     const fingerprint = getBrowserfingerprint(browserUniqueID, emulateFlag);
+
+
     logger.info(`fingerprint-webgl-vendor-${fingerprint.WEBGL_VENDOR}`);
     logger.info(`fingerprint-webgl-renderer-${fingerprint.WEBGL_RENDERER}`);
     logger.info(`fingerprint-ua-ua-${fingerprint.userAgent}`);
@@ -320,7 +328,6 @@ class PuppeteerBot {
           debugConsole('PAGE LOG:', msg);
         }
       });
-      await page.on('pageerror', err => debug('PAGE ERR:', err));
     }
 
     const DIMENSION = {
@@ -331,50 +338,9 @@ class PuppeteerBot {
         * (fingerprint.screenHeight - minHeight)), 10)),
     };
 
-    /* eslint-disable */
-    await page.evaluateOnNewDocument(async (fingerprint, LO, isVisibleStr, D, flags) => {
-      const F = new Set(flags);
-      setTimeout(() => {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const name in this) {
-          // eslint-disable-next-line no-continue
-          if (name === 'webkitStorageInfo') continue;
-          try {
-            // Check CoinHive like miners
-            if (this[name] &&
-              typeof this[name] !== 'undefined' &&
-              typeof this[name].isRunning === 'function' &&
-              typeof this[name].stop === 'function' &&
-              (typeof this[name]._siteKey === 'string' || typeof this[name]._newSiteKey === 'string' || typeof this[name]._address === 'string')
-            ) {
-              // eslint-disable-next-line no-console
-              console.log('[+] Coinhive miner found, stopping...');
-              this[name].stop();
-              this[name] = null;
-            }
-
-            // Check Mineralt miners
-            if (this[name] &&
-              typeof this[name] !== 'undefined' &&
-              typeof this[name].db === 'function' &&
-              typeof this[name].getlf === 'function' &&
-              typeof this[name].stop === 'function' &&
-              typeof this[name].hps === 'function'
-            ) {
-              // eslint-disable-next-line no-console
-              console.log('[+] Mineralt miner found, stopping...');
-              this[name].stop();
-              this[name] = null;
-            }
-          } catch (err) {
-            // ignore
-          }
-        }
-      }, 2000);
-
-      // eslint-disable-next-line no-eval
-      eval(isVisibleStr);
-      window.eyIsVisible = isVisible;
+    /*eslint-disable */
+    await page.evaluateOnNewDocument(async (fingerprint, LO, D, flags) => {
+      const F = new Set(flags); // TODO: F should contain evasions or disguise attributes to be applied. (Default: All)
 
       const logOverride = (key, value) => {
         if (!LO) return value;
@@ -389,7 +355,7 @@ class PuppeteerBot {
         spec.mimeTypes.forEach((m, i) => {
           plugin[i] = m;
           Object.assign(m, {
-            enabledPlugin: plugin
+            enabledPlugin: plugin,
           });
         });
         // eslint-disable-next-line no-param-reassign
@@ -424,34 +390,34 @@ class PuppeteerBot {
         }),
         2: buildPlugin({
           mimeTypes: [{
-              type: 'application/x-nacl',
-              suffixes: '',
-              description: 'Native Client Executable',
-              enabledPlugin: true,
-            }, {
-              type: 'application/x-pnacl',
-              suffixes: '',
-              description: 'Portable Native Client Executable',
-              enabledPlugin: true,
-            },
-            {
-              type: 'text/html',
-              suffixes: '',
-              description: '',
-              enabledPlugin: true,
-            },
-            {
-              type: 'application/x-ppapi-vysor',
-              suffixes: '',
-              description: '',
-              enabledPlugin: true,
-            },
-            {
-              type: 'application/x-ppapi-vysor-audio',
-              suffixes: '',
-              description: '',
-              enabledPlugin: true,
-            },
+            type: 'application/x-nacl',
+            suffixes: '',
+            description: 'Native Client Executable',
+            enabledPlugin: true,
+          }, {
+            type: 'application/x-pnacl',
+            suffixes: '',
+            description: 'Portable Native Client Executable',
+            enabledPlugin: true,
+          },
+          {
+            type: 'text/html',
+            suffixes: '',
+            description: '',
+            enabledPlugin: true,
+          },
+          {
+            type: 'application/x-ppapi-vysor',
+            suffixes: '',
+            description: '',
+            enabledPlugin: true,
+          },
+          {
+            type: 'application/x-ppapi-vysor-audio',
+            suffixes: '',
+            description: '',
+            enabledPlugin: true,
+          },
           ],
           name: 'Native Client',
           description: '',
@@ -470,9 +436,10 @@ class PuppeteerBot {
         }),
       };
 
+      // TODO: Create this dynamically from fingerprint attributes
       const chrome = {
         app: {
-          isInstalled: false,
+          isInstalled: true,
         },
         webstore: {
           onInstallStageChanged: {},
@@ -516,6 +483,10 @@ class PuppeteerBot {
         },
       };
 
+
+      window.chrome = chrome;
+
+      // eslint-disable-next-line no-restricted-properties
       window.screen.__defineGetter__('width', () => logOverride('width', fingerprint.screenWidth));
       window.screen.__defineGetter__('availWidth', () => logOverride('availWidth', fingerprint.screenWidth));
       window.__defineGetter__('innerWidth', () => logOverride('innerWidth', D.width));
@@ -528,10 +499,18 @@ class PuppeteerBot {
       window.navigator.__defineGetter__('userAgent', () => logOverride('userAgent', fingerprint.userAgent));
       window.navigator.__defineGetter__('platform', () => logOverride('platform', fingerprint.platform));
       window.navigator.__defineGetter__('appName', () => logOverride('appName', fingerprint.appName));
-      window.navigator.__defineGetter__('webdriver', () => logOverride('webdriver', undefined));
-      window.navigator.__defineGetter__('plugins', () => logOverride('plugins', plugins));
+
+      // webdriver
+      const newProto = window.navigator.__proto__;
+      delete newProto.webdriver;
+      navigator.__proto__ = newProto;
+
       window.navigator.__defineGetter__('languages', () => logOverride('languages', ['en-US,en']));
-      window.navigator.__defineGetter__('chrome', () => logOverride('chrome', chrome));
+      window.navigator.__defineGetter__('plugins', () => logOverride('plugins', plugins));
+
+
+      window.navigator.__defineGetter__('getUserMedia', () => logOverride('getUserMedia', undefined));
+      window.navigator.__defineGetter__('webkitGetUserMedia', () => logOverride('webkitGetUserMedia', undefined));
 
       // reject webRTC fingerprinting
       window.__defineGetter__('MediaStreamTrack', () => logOverride('MediaStreamTrack', undefined));
@@ -541,51 +520,48 @@ class PuppeteerBot {
       window.__defineGetter__('webkitRTCPeerConnection', () => logOverride('webkitRTCPeerConnection', undefined));
       window.__defineGetter__('webkitRTCSessionDescription', () => logOverride('webkitRTCSessionDescription', undefined));
 
-      // canvas
-      if (!F.has('-canvas')) {
-        class WebGLRenderingContext {
-          constructor(cvs) {
-            this.extension = {
-              UNMASKED_VENDOR_WEBGL: 37445,
-              UNMASKED_RENDERER_WEBGL: 37446,
-            };
-            this.canvas = cvs;
-            this.parameter = '';
-            this.viewportWidth = cvs.width;
-            this.viewportHeight = cvs.height;
-            this.supportedExtensions = ['ANGLE_instanced_arrays', 'EXT_blend_minmax', 'EXT_color_buffer_half_float', 'EXT_frag_depth', 'EXT_shader_texture_lod', 'EXT_texture_filter_anisotropic', 'WEBKIT_EXT_texture_filter_anisotropic', 'EXT_sRGB', 'OES_element_index_uint', 'OES_standard_derivatives', 'OES_texture_float', 'OES_texture_float_linear', 'OES_texture_half_float', 'OES_texture_half_float_linear', 'OES_vertex_array_object', 'WEBGL_color_buffer_float', 'WEBGL_compressed_texture_s3tc', 'WEBKIT_WEBGL_compressed_texture_s3tc', 'WEBGL_compressed_texture_s3tc_srgb', 'WEBGL_debug_renderer_info', 'WEBGL_debug_shaders', 'WEBGL_depth_texture', 'WEBKIT_WEBGL_depth_texture', 'WEBGL_draw_buffers', 'WEBGL_lose_context', 'WEBKIT_WEBGL_lose_context'];
-          }
-
-          getExtension() {
-            return this.extension;
-          }
-
-          getParameter() {
-            return this.extension;
-          }
-
-          getSupportedExtensions() {
-            return this.supportedExtensions;
-          }
+      class WebGLRenderingContext {
+        constructor(cvs) {
+          this.extension = {
+            WEBGL_VENDOR: 37445,
+            UNMASKED_RENDERER_WEBGL: 37446,
+          };
+          this.canvas = cvs;
+          this.parameter = '';
+          this.viewportWidth = cvs.width;
+          this.viewportHeight = cvs.height;
+          this.supportedExtensions = ['ANGLE_instanced_arrays', 'EXT_blend_minmax', 'EXT_color_buffer_half_float', 'EXT_frag_depth', 'EXT_shader_texture_lod', 'EXT_texture_filter_anisotropic', 'WEBKIT_EXT_texture_filter_anisotropic', 'EXT_sRGB', 'OES_element_index_uint', 'OES_standard_derivatives', 'OES_texture_float', 'OES_texture_float_linear', 'OES_texture_half_float', 'OES_texture_half_float_linear', 'OES_vertex_array_object', 'WEBGL_color_buffer_float', 'WEBGL_compressed_texture_s3tc', 'WEBKIT_WEBGL_compressed_texture_s3tc', 'WEBGL_compressed_texture_s3tc_srgb', 'WEBGL_debug_renderer_info', 'WEBGL_debug_shaders', 'WEBGL_depth_texture', 'WEBKIT_WEBGL_depth_texture', 'WEBGL_draw_buffers', 'WEBGL_lose_context', 'WEBKIT_WEBGL_lose_context'];
         }
 
-        const canvas = document.createElement('canvas');
-        const canvasProto = Object.getPrototypeOf(canvas);
-        const origGetContext = canvasProto.getContext;
-        canvasProto.getContext = function getContext(...args) {
-          const context = origGetContext && (origGetContext.call(this, ...args) ||
-            origGetContext.call(this, args[0]));
-          if (!context) {
-            logOverride('canvas.getContext', 'new WebGLRenderingContext()');
-            return new WebGLRenderingContext(this);
-          }
-          return context;
-        };
-        canvasProto.getContext.toString = generateToString('getContext');
+        getExtension() {
+          return this.extension;
+        }
+
+        getParameter() {
+          return this.extension;
+        }
+
+        getSupportedExtensions() {
+          return this.supportedExtensions;
+        }
       }
 
+      const canvas = document.createElement('canvas');
+      const canvasProto = Object.getPrototypeOf(canvas);
+      const origGetContext = canvasProto.getContext;
+      canvasProto.getContext = function getContext(...args) {
+        const context = origGetContext && (origGetContext.call(this, ...args)
+            || origGetContext.call(this, args[0]));
+        if (!context) {
+          logOverride('canvas.getContext', 'new WebGLRenderingContext()');
+          return new WebGLRenderingContext(this);
+        }
+        return context;
+      };
+      canvasProto.getContext.toString = generateToString('getContext');
+
       function hookPrototypeMethods(prefix, object) {
-        // TODO: also hook getters
+        // TODO: [BAC-4] also hook getters
         if (!object) return;
         const originals = {};
         const prototype = Object.getPrototypeOf(object);
@@ -618,7 +594,7 @@ class PuppeteerBot {
                   // eslint-disable-next-line no-empty
                 } catch (e) {}
                 // eslint-disable-next-line no-console
-                console.log('function called', prefix, n, JSON.stringify(args), 'result:', result, jsonResult, `${result}`);
+                this.logger.verbose('function called', prefix, n, JSON.stringify(args), 'result:', result, jsonResult, `${result}`);
               }
               return result;
             };
@@ -638,8 +614,8 @@ class PuppeteerBot {
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         if (gl) {
           glProto.getParameter = function getParameter(...args) {
-            if (args[0] === debugInfo.UNMASKED_VENDOR_WEBGL) return logOverride('gl.getParameter.UNMASKED_VENDOR_WEBGL', fingerprint.WEBGL_VENDOR);
-            if (args[0] === debugInfo.UNMASKED_RENDERER_WEBGL) return logOverride('gl.getParameter.UNMASKED_RENDERER_WEBGL', fingerprint.WEBGL_RENDERER);
+            if (args[0] === debugInfo.WEBGL_VENDOR) return logOverride('gl.getParameter.WEBGL_VENDOR', fingerprint.WEBGL_VENDOR);
+            if (args[0] === debugInfo.WEBGL_RENDERER) return logOverride('gl.getParameter.WEBGL_RENDERER', fingerprint.WEBGL_RENDERER);
             if (args[0] === 33901) return new Float32Array([1, 8191]);
             if (args[0] === 3386) return new Int32Array([16384, 16384]);
             if (args[0] === 35661) return 80;
@@ -655,49 +631,75 @@ class PuppeteerBot {
         }
       });
 
-      if (LO) {
-        if (!F.has('-canvas')) {
-          hookPrototypeMethods('webgl', document.createElement('canvas').getContext('webgl'));
-          hookPrototypeMethods('experimental-webgl', document.createElement('canvas').getContext('experimental-webgl'));
-          hookPrototypeMethods('2d', document.createElement('canvas').getContext('2d'));
-          hookPrototypeMethods('canvas', canvas);
-        }
-        hookPrototypeMethods('screen', window.screen);
-        hookPrototypeMethods('navigator', window.navigator);
-        hookPrototypeMethods('history', window.history);
-      }
+      hookPrototypeMethods('webgl', document.createElement('canvas').getContext('webgl'));
+      hookPrototypeMethods('experimental-webgl', document.createElement('canvas').getContext('experimental-webgl'));
+      hookPrototypeMethods('2d', document.createElement('canvas').getContext('2d'));
+      hookPrototypeMethods('canvas', canvas);
 
-      // Pass the Permissions Test.
+      hookPrototypeMethods('screen', window.screen);
+      hookPrototypeMethods('navigator', window.navigator);
+      hookPrototypeMethods('history', window.history);
+    }, fingerprint, LOG_OVERRIDE, DIMENSION, disguiseFlags);
+
+
+
+    await page.evaluateOnNewDocument(() => {
       const originalQuery = window.navigator.permissions.query;
-      return window.navigator.permissions.query = (parameters) => (parameters.name === 'notifications' ? Promise.resolve({
-        state: Notification.permission
-      }) : originalQuery(parameters));
+      window.navigator.permissions.__proto__.query = parameters => parameters.name !== 'notifications'
+          ? originalQuery(parameters)
+        : Promise.resolve({ state: Notification.permission });
 
-    }, fingerprint, LOG_OVERRIDE, isVisible.toString(), DIMENSION, disguiseFlags);
-    /* eslint-enable */
+      const oldCall = Function.prototype.call;
+      function call() {
+        return oldCall.apply(this, arguments);
+      }
+      Function.prototype.call = call
+
+      const nativeToStringFunctionString = Error.toString().replace(
+        /Error/g,
+        'toString',
+      );
+      const oldToString = Function.prototype.toString;
+
+      function functionToString() {
+        if (this === window.navigator.permissions.query) {
+          return 'function query() { [native code] }';
+        }
+        if (this === functionToString) {
+          return nativeToStringFunctionString;
+        }
+        return oldCall.call(oldToString, this);
+      }
+      Function.prototype.toString = functionToString
+    });
 
     await page.goto('about:blank');
 
-    // eslint-disable-next-line no-undef
     const UA = await page.evaluate(() => window.navigator.userAgent);
+
+     /* eslint-enable */
     await page.setUserAgent(UA);
     await page.setExtraHTTPHeaders({
       'Accept-Language': 'en-US,en;q=0.9',
       'Accept-Encoding': 'gzip, deflate, br',
     });
 
-    // spoof geolocation if available
-    await browserContext.overridePermissions(page.url(), ['geolocation']);
+
+    await browserContext.overridePermissions(page.url(), ['geolocation', 'midi', 'notifications', 'microphone', 'payment-handler']);
+
     if (_.isFinite(geolocation.latitude) && _.isFinite(geolocation.longitude)) {
-      debug(`geolocation-spoofed-${geolocation.latitude}:${geolocation.longitude}`);
+      debugConsole(`setting-geolocation:${geolocation.latitude}:${geolocation.longitude}`);
+
       await page.setGeolocation({
         latitude: geolocation.latitude,
         longitude: geolocation.longitude,
       });
     }
 
+
+    await page.setBypassCSP(true);
     await page.setViewport(DIMENSION);
-    await page.setDefaultTimeout(30000);
+    await page.setDefaultTimeout(150000);
   }
 
   /* eslint-disable */

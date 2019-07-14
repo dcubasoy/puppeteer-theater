@@ -5,8 +5,21 @@ const _ = require('lodash');
 const Show = require('./theater/show');
 const logger = require('../routers/bots/logger');
 
+const redis = require('../utils/redis');
+
 const db = admin.firestore();
 
+
+
+/**
+ * @description Reporter linked to redis & firestore: updates credit scores, uploads the latest credit report, saves the session after successful registration.
+ * @export onCreditDocumentBotResult: Intended for emitting object containing PDF report.
+ * @export onCreditAccountBotResult: Intended for emitting object contanining username/password/session (credential) captured upon succesful registration on credit monitoring site.
+ *
+ * @param {Show} show: The show injected when constructor called.
+ * @param {string} userId: Unique id for profiles in firestore. Adjust accordingly to your use-case.
+ * @param {string} botName: Bot name (ex. creditkarma-extractor)
+ */
 class BotResultReporter {
   constructor({
     show,
@@ -29,15 +42,12 @@ class BotResultReporter {
   // --- Public API
   // ==========================================================================================
 
-  async onCreditAccountBotResult(result) {
-    if (result.meta) {
-      // merge to profile
-      await db.collection('profiles').doc(this.userId).set(result.meta, { merge: true });
-    }
 
+  async onCreditAccountBotResult(result) {
     const obj = await this.resultCreditAccountReport(result);
     try {
-      await db.collection('profiles').doc(this.userId).collection('accounts').add(obj);
+      await db.collection('profiles').doc(this.userId).set({ accounts: admin.firestore.FieldValue.arrayUnion(obj) });
+      await redis.lpush('credit-account-bot-consumer:', JSON.stringify(obj));
     } catch (error) {
       this.logger.error('onCreditAccountBotResult-failed to report', { error });
     }
@@ -47,11 +57,11 @@ class BotResultReporter {
     const obj = await this.resultCreditDocumentBotReport(result);
     try {
       await db.collection('reports').add(obj);
+      await redis.lpush('credit-document-bot-consumer:', JSON.stringify(obj));
     } catch (error) {
       this.logger.error('onCreditDocumentBotResult-failed to report', { error });
     }
   }
-
 
   // ===========================================================================================
   // --- Internal Functions (Results)
@@ -73,7 +83,6 @@ class BotResultReporter {
       statusVersion: new Date(),
       botName: this.botName,
       profileId: this.userId,
-      status: obj.status || 'Linked',
       score: this.show.context('score') || 0,
     };
     return _.omit(Object.assign(result, obj), ['report']);
