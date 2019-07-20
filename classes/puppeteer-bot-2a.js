@@ -277,7 +277,7 @@ class PuppeteerBot2a {
     this.cleanUps = [];
     this.requestIds = [];
 
-    this.logger = logger || winston.createLogger();
+    this.logger = logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
     this.label = label;
 
     this.healthCheckTimeout = undefined;

@@ -24,7 +24,8 @@ class TheaterLogFirebaseReporter {
     this.userId = userId || shortid.generate();
     this.incrValue = 0;
     this.bucket = gcs.bucket(bucket);
-    this.logger = this.logger || winston.createLogger();
+    this.logger = this.logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
+
 
     this.botTasksCount = 0;
     this.botFreeResolves = [];

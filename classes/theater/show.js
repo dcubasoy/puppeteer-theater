@@ -88,7 +88,8 @@ class Show extends EventEmitter {
     super();
 
     this.ref = shortid.generate();
-    this.logger = logger || winston.createLogger();
+    this.logger = logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
+
     this.ctx = {};
     this.Scenes = Scenes || Object.values(this.constructor.Scenes) || [];
     this.Scenes.forEach((S, i) => assert(S.prototype instanceof Scene, `Scenes[${i}] ${S.name} is not valid Scene`));

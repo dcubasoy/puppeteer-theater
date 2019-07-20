@@ -20,7 +20,8 @@ class TheaterLogS3Reporter {
     this.startedAt = new Date();
     this.show = show;
     this.bot = bot;
-    this.logger = logger || winston.createLogger();
+    this.logger = logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
+
     this.userId = userId || shortid.v4();
     this.incrValue = 0;
     this.bucket = bucket;

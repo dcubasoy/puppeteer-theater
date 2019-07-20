@@ -3,6 +3,8 @@ const PuppeteerBot2a = require('../../../classes/puppeteer-bot-2a');
 const TheaterLogFirebaseReporter = require('../../../classes/theater-log-firebase-reporter');
 
 const BotResultReporter = require('../../../classes/bot-result-reporter');
+
+
 const name = 'paypal-signin';
 
 async function runBot(spec) {

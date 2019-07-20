@@ -32,7 +32,7 @@ class BotResultReporter {
     this.show = show;
     this.status = 'Linked';
     this.userId = userId || shortid.generate();
-    this.logger = logger || winston.createLogger();
+    this.logger = logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
 
     this.botTasksCount = 0;
     this.botFreeResolves = [];
@@ -60,6 +60,17 @@ class BotResultReporter {
       this.console.error('onCreditDocumentBotResult-failed to report', { error });
     }
   }
+
+  async onRetailerBotResult(result) {
+    const obj = await this.resultRetailerBotReport(result);
+    try {
+      await db.collection('botResults').add(obj);
+      await redis.lpush('retailer-bot-consumer:', JSON.stringify(result));
+    } catch (error) {
+      this.logger.error('failed to report', { error });
+    }
+  }
+
 
   // ===========================================================================================
   // --- Internal Functions (Results)
