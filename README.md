@@ -4,7 +4,8 @@
 - Fixed the year below (lol).
 - Added new base class, extensions for infinite scrolling, improved some of the internal anit bot detection mechanisms due to challenge from [https://arh.antoinevastel.com/reports/stats/menu.html](https://arh.antoinevastel.com/reports/stats/menu.html)
 The wrapper still fails (and nothing to my knowledge chromium based) will also fail on his latest 'am i chrome headless?' page.
-## Updates: 07/14/20169
+
+## Updates: 07/14/2019
 
 - Added JSDoc for everything!
 - Generated new API documentation using an automated tool (thankfully...)
@@ -624,7 +625,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTYzODY2MTE2NiwtODEwNDMzNjM5LDY0MT
+eyJoaXN0b3J5IjpbMTY3MjI4MTkzOCwtODEwNDMzNjM5LDY0MT
 k0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAs
 MTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMT
 E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
