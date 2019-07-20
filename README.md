@@ -1,9 +1,9 @@
-## Updates: 07/26/2019
-- Corrected 2016 as the year below (lmmao)
-- Added new base class with more functionality and `check()` API method that will check against the well known bot master's challenges, including the latest 'are you headless?'. Its failing right now, but given pptr-firefox is passing as a stand-in + the API is 99% equivalent I doubt anyone is going that deep into your browser.
+<a href="http://puppeteer.theater"><img src="https://i.imgur.com/oGlafjU.jpg" title="theater" alt="theater">
 
--
-
+## Updates: 07/20/2019
+- Fixed the year below (lol).
+- Added new base class, extensions for infinite scrolling, improved some of the internal anit bot detection mechanisms due to challenge from [https://arh.antoinevastel.com/reports/stats/menu.html](https://arh.antoinevastel.com/reports/stats/menu.html)
+The wrapper still fails (and nothing to my knowledge chromium based) will also fail on his latest 'am i chrome headless?' page.
 
 ## Updates: 07/14/2019
 
@@ -18,34 +18,54 @@ Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theat
 
 ##  Purpose & Inspiration
 
-In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.**
+In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.** It does not wait for navigations, its looking for a set of conditions that when evaluated and return true, execute some particular code.
 
  On the highest level, it achieves this by dealing with units of work as: **Shows & Scenes**.
 
-A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple! I am waiting on permission from Capital One to use this show as a demonstration. ❤️ Note: I cannot endorse violating any terms of use of anything legally speaking, but banks and other usual suspects are often good practice for seeing how well you can evade bot detection techniques. Or so I am told. 👮
+A show **might describe an entire site, like "Capital One".**
 
+Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account).
+
+Scenes describe how the page looks and you decide what the bot does. It's simple! ❤️ And dangerous- its perfect for account takeovers (or worse). Note: I cannot endorse violating any terms of use of anything legally speaking. But hypothetically, do no harm and call it a day.
+
+
+Lets dive in.
 Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().`
 
 What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
 
-This is a core value proposition theater offers.
+- This is a one of many enhancements over plain pupepteer script theater offers.
+- Another one: EventEmitter. Consider you want to just:
+-  `on('botCreatedAccount', (o) => doSomething(o));`
 
-By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manually to appear. No more `wait(5000)` dirty code that breaks in production due to network changes or any numberof factors.
+You can define any custom events you wish.
+
+One line, just told us how to handle whenever our bot creates an account succesfully. Maybe we store the data, or spawn another bot to provision the account! I love this pattern EventEmitter provides.
 
 Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like
 1) recaptcha challenges
 2) generic captchas
 3) clicking all the annoying pop ups that screw up your automation (`.spinner`)
+4) Infinite Scrolling
+5) Custom function evaluations in browser context
+6) Delaying for a random or specified portion of time, to not appear like  a bot.
 
-Read the docs for a detailed description.
+The `Scene.Extensions` portion could be made way more powerful and I welcome PRs.
 
-Tested & Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0. Integration with selenium-webdriver is in process.
+Read the docs for a detailed description of the whole API.
 
- [Puppeteer docs] (https://pptr.dev/)
- [MDN docs] (https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+### Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0.
+References that are useful when reading this and any puppeteer code:
 
+-  [Puppeteer docs] (https://pptr.dev/)
+ - [MDN docs] (https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+
+
+### WTF is this repo?
 The repo is just a basic RESTful API for you to execute bots and understand how the framework operates internally. To that end, you'll want to make sure to:
 `export DEBUG=theater*`
+
+Just do it.
 
 ### How to just rip and run?
 
@@ -56,6 +76,20 @@ The repo is just a basic RESTful API for you to execute bots and understand how 
 
 `export DEBUG=theater*`
 
+`npm start`
+
+```
+curl --request POST \
+  --url http://localhost/bots/paypal-signin/run \
+  --header 'content-type: application/json' \
+  --data '{
+    "username": "nico@nicomee.com",
+    "password": "hackedyourshit",
+    "userId": "nico@nicomee.com.hackedyourshit"
+}
+```
+
+Browser will launch, console output will show theater inner workings.
 # # Base Classes
 
 ## class: Show
@@ -528,6 +562,12 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
  ### new Scene.Extension.ReCAPTCHAv2(targetElementName, siteKeyFn)
 
 - `targetElementName` is element name wherein `#g-recaptcha-response` is contained in child nodes of this element. Most often seen as `.g-recaptcha`. This extension will determine site-key from provided `siteKeyFn()`, solve recaptcha, use `getFrame()` if needed to properly set response, and invoke the  callback function (if present) to trigger the result after captcha has been solved.
+-
+##  class: Scene.Extensions.Scroll
+
+ ### new Scene.Extension.Scroll(time, repeats)
+
+- Simply Scrolls for the given time (in ms), and repeats scrollRepeats (default = 5) times. Designed for infinite scrolling scenarios.
 
 ## Core Components
 Some of the syntax within Theater can seem intimidating but it is pretty simple once you understand the underlying components.
@@ -600,20 +640,22 @@ You can find some real-examples of this in the `classes/theater/shows` folder.
 
 ## Test Driven Development
 
-These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page and add a test assertion in `show-tests/example` folder where `example` is your Show name. I'm looking to improve the way I'm currently handling the test setup & tear down with puppeteer. In conclusion, this project is in its infancy but it holds a great deal of promise for those immersed in web automation and scraping. I welcome any and all criticism or comments and will be contributing reguarly.
+These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page and add a test assertion in `show-tests/example` folder where `example` is your Show name.
 
-## Contributing "rules"
+
+Run `node index.js` after running `cd classes/theater/show-tests/`. This is my primitive test runner.
+
+## Contribution guidelines
 This is my first real open-source project that I'll be maintaining, I'd love contributions, questions, criticism, or guidance!
 
 ## Contact
-nicokokonas@mindwise.io
 
 [https://webscrapers.slack.com](https://webscrapers.slack.com/) for a prompt response, message me here!
 
-
+[https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTgxMDQzMzYzOSw2NDE5NDEyMjcsOTI1Nz
-QzNTE1LDExMDU5Mzg0MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAs
-LTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLT
-E5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbMTkwMTgyMTU4MSwtMTk4ODcxMTMxOCwtOD
+EwNDMzNjM5LDY0MTk0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQw
+Myw3NjY2NzI5OTAsMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMT
+g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
