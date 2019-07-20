@@ -1,5 +1,4 @@
-const PromiseCondition = require('../../promise-condition');
-const CreditKarmaJustClickAwareScene = require('./just-click-aware-scene');
+const PromiseCondition = require('../../promise-condition');const CreditKarmaJustClickAwareScene = require('./just-click-aware-scene');
 
 class CreditKarmaWelcomeBackScene extends CreditKarmaJustClickAwareScene.WithSpinner {
   constructor(args) {

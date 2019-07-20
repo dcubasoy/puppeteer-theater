@@ -1,5 +1,6 @@
 const assert = require('assert');
 const util = require('util');
+const winston = require('winston');
 const shortid = require('shortid');
 const Storage = require('@google-cloud/storage');
 
@@ -12,7 +13,7 @@ class TheaterLogFirebaseReporter {
     show,
     bot,
     userId,
-    bucket = 'nicos-puppeteer-bot-logs',
+    bucket = 'puppeteer-bot-theater-logs',
   }) {
     assert(show instanceof Show, 'emitter is not instance of Show');
 
@@ -23,7 +24,7 @@ class TheaterLogFirebaseReporter {
     this.userId = userId || shortid.generate();
     this.incrValue = 0;
     this.bucket = gcs.bucket(bucket);
-    this.logger = this.logger;
+    this.logger = this.logger || winston.createLogger();
 
     this.botTasksCount = 0;
     this.botFreeResolves = [];
@@ -59,7 +60,7 @@ class TheaterLogFirebaseReporter {
       const file = this.bucket.file(dest);
       await file.save(Body, options);
     } catch (error) {
-      this.logger.error('gcsUpload', { error });
+      this.console.error('gcsUpload', { error });
     }
   }
 
@@ -90,7 +91,7 @@ class TheaterLogFirebaseReporter {
       this.gcsUpload('text/html', `${prefix}-page.html`, await this.bot.page.content());
       this.gcsUpload('image/png', `${prefix}-page.png`, screenshot);
     } catch (error) {
-      this.logger.error('botDump', { error });
+      this.console.error('botDump', { error });
     } finally {
       this.releaseBotTask();
     }

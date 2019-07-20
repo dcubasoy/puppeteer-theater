@@ -2,8 +2,8 @@ const AWS = require('aws-sdk');
 const shortid = require('shortid');
 const assert = require('assert');
 const util = require('util');
+const winston = require('winston');
 const Show = require('./theater/show');
-const logger = require('../utils/logger');
 
 
 const s3 = new AWS.S3();
@@ -20,7 +20,7 @@ class TheaterLogS3Reporter {
     this.startedAt = new Date();
     this.show = show;
     this.bot = bot;
-    this.logger = logger;
+    this.logger = logger || winston.createLogger();
     this.userId = userId || shortid.v4();
     this.incrValue = 0;
     this.bucket = bucket;
@@ -54,7 +54,7 @@ class TheaterLogS3Reporter {
         Key: this.s3Key(filename),
       }).promise();
     } catch (error) {
-      this.logger.error('s3Upload', { error });
+      this.console.error('s3Upload', { error });
     }
   }
 
@@ -85,7 +85,7 @@ class TheaterLogS3Reporter {
       this.upload('text/html', `${prefix}-page.html`, await this.bot.page.content());
       this.upload('image/png', `${prefix}-page.png`, screenshot);
     } catch (error) {
-      this.logger.error('botDump', { error });
+      this.console.error('botDump', { error });
     } finally {
       this.releaseBotTask();
     }

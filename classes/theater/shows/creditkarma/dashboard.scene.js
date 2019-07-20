@@ -1,5 +1,4 @@
-const PromiseCondition = require('../../promise-condition');
-const CreditKarmaSpinnerAwareScene = require('./spinner-aware-scene');
+const PromiseCondition = require('../../promise-condition');const CreditKarmaSpinnerAwareScene = require('./spinner-aware-scene');
 
 class CreditKarmaDashboardScene extends CreditKarmaSpinnerAwareScene {
   constructor(args) {
@@ -23,13 +22,6 @@ class CreditKarmaDashboardScene extends CreditKarmaSpinnerAwareScene {
       },
       generic: false,
     }, args));
-
-    this.show.on('creditAccountBotResult', (o) => {
-      if (o.status !== 'Linked') return;
-      // now we can confirm that username and password pair is good
-      this.setContext('username', this.context('tempUsername') || this.context('username'));
-      this.setContext('password', this.context('tempPassword') || this.context('password'));
-    });
   }
 
   async accessToken() {
@@ -51,6 +43,10 @@ class CreditKarmaDashboardScene extends CreditKarmaSpinnerAwareScene {
     this.log('Linked');
     this.show.emit('creditAccountBotResult', {
       status: 'Linked',
+      meta: {
+        creditKarmaUsername: this.context('username'),
+        creditKarmaPassword: this.context('password'),
+      }
     });
 
     if (this.context('harvestEnabled')) {

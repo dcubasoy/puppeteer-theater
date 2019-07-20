@@ -16,7 +16,7 @@ class CreditKarmaValidationFailedScene extends Scene {
   async play() {
     await super.play();
     this.show.emit('creditAccountBotResult', { status: 'NoHitFile' });
-    throw new Error('NoHitFile');
+    throw new Error((500, 'NoHitFile');
   }
 }
 

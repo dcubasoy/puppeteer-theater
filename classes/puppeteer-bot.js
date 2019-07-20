@@ -735,7 +735,7 @@ class PuppeteerBot {
         });
         captchaResponseBody = body;
       } catch (e) {
-        logger.error(e);
+        console.error(e);
       }
 
       if (captchaResponseBody) {
@@ -767,7 +767,7 @@ class PuppeteerBot {
         body: buffer.toString('base64'),
       })) || {}).text || '';
     } catch (error) {
-      this.logger.error('failed-resolve-captcha', await this.dump({
+      this.console.error('failed-resolve-captcha', await this.dump({
         error,
         buffer: buffer.toString('base64'),
       }));
@@ -801,7 +801,7 @@ class PuppeteerBot {
       await this.stopBrowser();
       await this.stopHealthCheck();
     } catch (error) {
-      this.logger.error('deinit-error', {
+      this.console.error('deinit-error', {
         error,
       });
     }
@@ -815,7 +815,7 @@ class PuppeteerBot {
     const field = req.url;
     // prevent block
     redis.multi().hset(key, field, response).expire(key, 60 * 60 * 6).exec((error) => {
-      if (error) this.logger.error('redis-url-cache-store-error', { error, url: req.url });
+      if (error) this.console.error('redis-url-cache-store-error', { error, url: req.url });
     });
 
     const parsed = JSON.parse(response);
@@ -836,7 +836,7 @@ class PuppeteerBot {
       parsed.body = Buffer.from(parsed.body, 'base64');
       return parsed;
     } catch (error) {
-      this.logger.error('redis-url-cache-error', {
+      this.console.error('redis-url-cache-error', {
         error,
         url: req.url,
       });
@@ -978,7 +978,7 @@ class PuppeteerBot {
         })))(),
       ]);
     } catch (error) {
-      this.logger.error('captureToS3', {
+      this.console.error('captureToS3', {
         error,
       });
     }
@@ -994,7 +994,7 @@ class PuppeteerBot {
         Key: [process.env.NODE_ENV === 'production' ? 'prod' : 'dev', `${this.botId}/${filename}`].join('/'),
       }).promise();
     } catch (error) {
-      this.logger.error('s3Upload', {
+      this.console.error('s3Upload', {
         error,
       });
     }
@@ -1388,7 +1388,7 @@ class PuppeteerBot {
         await this.stopBrowser();
       }
     } catch (error) {
-      this.logger.error('health-check-repeater-error', await this.dump({ error }));
+      this.console.error('health-check-repeater-error', await this.dump({ error }));
     } finally {
       if (this.browser && this.healthCheckTimeout) {
         this.healthCheckTimeout = setTimeout(async () => {
@@ -1402,14 +1402,14 @@ class PuppeteerBot {
     this.healthCheckStartedAt = this.healthCheckStartedAt || Date.now();
 
     if (Date.now() - this.healthCheckStartedAt > this.browserTimeout) {
-      this.logger.error('health-check-failed-browser-timeout', await this.dump());
+      this.console.error('health-check-failed-browser-timeout', await this.dump());
       return false;
     }
 
     try {
       if (this.interaction && this.interaction.isUp) {
         if (!await this.interaction.checkValid()) {
-          this.logger.error('health-check-failed-interaction-invalid', await this.dump());
+          this.console.error('health-check-failed-interaction-invalid', await this.dump());
           return false;
         }
       }
@@ -1479,7 +1479,7 @@ class PuppeteerBot {
         this.logger.info(`fingerprint-maxmind-geoip-region-${region}`);
         this.logger.info(`fingerprint-maxmind-geoip-range-${range}`);
       } catch (error) {
-        this.logger.error(`maxmind-lookup-error-${error})`);
+        this.console.error(`maxmind-lookup-error-${error})`);
       }
     }
 
@@ -1488,7 +1488,7 @@ class PuppeteerBot {
       if (/Session closed\. Most likely the page has been closed/.test(error.message)) return;
       if (/Protocol error \(Runtime\.callFunctionOn\): Target closed/.test(error.message)) return;
       if (/Session error \(Runtime\.callFunctionOn\): Message timed out/.test(error.message)) return;
-      this.logger.error(`page-error-${Buffer.from(error.message).toString('base64')}`, {
+      this.console.error(`page-error-${Buffer.from(error.message).toString('base64')}`, {
         error,
       });
     };
@@ -1589,7 +1589,7 @@ class PuppeteerBot {
         }
 
         // eslint-disable-next-line no-underscore-dangle
-        this.logger.error(`request-failed-${interceptedReq._failureText}-${host}`, { skipList: true });
+        this.console.error(`request-failed-${interceptedReq._failureText}-${host}`, { skipList: true });
       });
 
       this.page.on('requestfinished', (interceptedReq) => {
@@ -1686,7 +1686,7 @@ class PuppeteerBot {
         await this.page.close();
       }
     } catch (error) {
-      this.logger.error('failed-page-close', await this.dump({ error }));
+      this.console.error('failed-page-close', await this.dump({ error }));
     } finally {
       this.page = null;
     }
@@ -1696,7 +1696,7 @@ class PuppeteerBot {
         await this.browser.close();
       }
     } catch (error) {
-      this.logger.error('failed-browser-close', await this.dump({ error }));
+      this.console.error('failed-browser-close', await this.dump({ error }));
     } finally {
       this.browser = null;
     }
@@ -1707,7 +1707,7 @@ class PuppeteerBot {
           this.cleanUps[i]();
         } catch (error) {
           // eslint-disable-next-line no-await-in-loop
-          this.logger.error('failed-call-cleanUp', await this.dump({ error }));
+          this.console.error('failed-call-cleanUp', await this.dump({ error }));
         } finally {
           this.cleanUps.splice(i, 1);
         }
@@ -1784,7 +1784,7 @@ class PuppeteerBot {
         try {
           await this.page.setCookie(cookie);
         } catch (error) {
-          this.logger.error('failed-setting-cookie', await this.dump({ cookie }));
+          this.console.error('failed-setting-cookie', await this.dump({ cookie }));
         }
       }));
     }
@@ -1826,7 +1826,7 @@ class PuppeteerBot {
 
       return buf;
     } catch (error) {
-      this.logger.error('error-getChromeUserData', {
+      this.console.error('error-getChromeUserData', {
         error,
       });
       return Buffer.from('');

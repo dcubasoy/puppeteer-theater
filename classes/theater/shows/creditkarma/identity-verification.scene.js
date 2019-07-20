@@ -59,30 +59,29 @@ class CreditKarmaIdentityVerificationScene extends CreditKarmaJustClickAwareScen
     this.log(`Matching zodiac sign: ${zodiac}`);
 
     const matched = await this.elements.labels.eval((els, stateIssued, stateIssuedFull, employerName, astroSign, zodiacSign, dobYear, lastFourSSN) => Array
-    .from(els)
-    .map((e) => e.innerText.includes('NONE OF THE ABOVE') ? e.click() : null)
-    .forEach((e) => {
-      let matches = [];
+      .from(els)
+      .map(e => (e.innerText.includes('NONE OF THE ABOVE') ? e.click() : null))
+      .forEach((el) => {
+        const matches = [];
 
-      function checkAnswer(el, target) {
-        if (el.innerText.includes(target)) {
+        function checkAnswer(target) {
+          if (el.innerText.includes(target)) {
             el.click();
             matches.push(el.innerText);
+          }
         }
-      }
 
-      checkAnswer(stateIssued);
-      checkAnswer(stateIssuedFull);
-      checkAnswer(employerName);
+        checkAnswer(stateIssued);
+        checkAnswer(stateIssuedFull);
+        checkAnswer(employerName);
 
-      checkAnswer(astroSign);
-      checkAnswer(zodiacSign);
-      checkAnswer(dobYear);
-      checkAnswer(lastFourSSN);
+        checkAnswer(astroSign);
+        checkAnswer(zodiacSign);
+        checkAnswer(dobYear);
+        checkAnswer(lastFourSSN);
 
-      return matches;
-
-    }), issuedStateName, issuedState, employer, astro, zodiac, dob[2], ssn[2]);
+        return matches;
+      }), issuedStateName, issuedState, employer, astro, zodiac, dob[2], ssn[2]);
 
     this.log('Matched ID Verification answers: ', matched);
     await this.elements.submitBtn.click();

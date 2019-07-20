@@ -1,5 +1,4 @@
-const PromiseCondition = require('../../promise-condition');
-const CreditKarmaJustClickAwareScene = require('./just-click-aware-scene');
+const PromiseCondition = require('../../promise-condition');const CreditKarmaJustClickAwareScene = require('./just-click-aware-scene');
 
 class CreditKarmaExistingMemberScene extends CreditKarmaJustClickAwareScene.WithSpinner {
   constructor(args) {
@@ -26,6 +25,7 @@ class CreditKarmaExistingMemberScene extends CreditKarmaJustClickAwareScene.With
       status: 'ExistingUser',
       email,
     });
+    throw new Error((500, 'ExistingAccount');
   }
 }
 

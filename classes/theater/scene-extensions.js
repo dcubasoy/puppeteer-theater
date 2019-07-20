@@ -1,8 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const assert = require('assert');
 const _ = require('lodash');
-const PromiseCondition = require('./promise-condition');
-
+const PromiseCondition = require('../../promise-condition');
 const wait = t => new Promise(r => setTimeout(r, t));
 
 /**

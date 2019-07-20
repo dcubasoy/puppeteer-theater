@@ -24,7 +24,7 @@ async function processScreenshots(screenshots) {
         .png()
         .toBuffer();
     } catch (err) {
-      logger.error('failed resizing buffer');
+      console.error('failed resizing buffer');
       return s;
     }
   }))).map((s, i) => ({

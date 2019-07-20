@@ -34,7 +34,6 @@ async function runBot(spec) {
     reporter = new BotResultReporter({
       show,
       userId: spec.userId,
-      logger,
       botName: name,
     });
 
@@ -42,7 +41,6 @@ async function runBot(spec) {
       show,
       bot,
       userId: spec.userId,
-      logger,
     });
 
 
@@ -58,7 +56,7 @@ async function runBot(spec) {
 
     await show.play();
   } catch (error) {
-    logger.error(`runBot-error-${error.message}`, await bot.dump({ error, bypassRateLimit: true }));
+    console.error(`runBot-error-${error.message}`, await bot.dump());
   } finally {
     if (theaterLogReporter) await theaterLogReporter.botFreePromise();
     if (reporter) await reporter.botFreePromise();
@@ -72,5 +70,4 @@ module.exports = {
   async run(spec) {
     return runBot(spec);
   },
-  router: TemplateSignInBot.router(name),
 };
