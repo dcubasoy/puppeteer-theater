@@ -64,18 +64,6 @@ async function checkSSN(ssn) {
   }
 }
 
-
-
-
-
-async function main() {
-  let resp = await checkSSN('608-08-7890');
-  console.log(resp);
-}
-
-main().catch(console.error);
-
-
 module.exports = {
     generatePassword,
     generateEmail,

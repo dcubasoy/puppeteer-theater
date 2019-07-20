@@ -22,7 +22,7 @@ class ExperianExistingAccountScene extends ExperianJustClickSpinnerAwareScene.Wi
 
   async play() {
     await super.play();
-    throw new Error, 'ExistingAccount');
+    throw new Error('ExistingAccount');
   }
 }
 

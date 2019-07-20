@@ -23,7 +23,7 @@ class ExperianNoHitCreditFileScene extends ExperianJustClickSpinnerAwareScene.Wi
     this.show.emit('creditAccountBotResult', {
       status: 'NoHitFile',
     });
-    throw new Error, 'NoHitFile');
+    throw new Error('NoHitFile');
   }
 }
 

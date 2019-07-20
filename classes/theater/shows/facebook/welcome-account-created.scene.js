@@ -51,7 +51,7 @@ class FacebookWelcomeAccountCreatedScene extends FacebokJustClickAwareScene.With
         });
         this.log('uploading', a.path.name, 'complete');
         for (let startedAt = Date.now(); ;) {
-          if (Date.now() - startedAt > 60 * 1000) throw new Error((500, 'upload-timeout');
+          if (Date.now() - startedAt > 60 * 1000) throw new Error('upload-timeout');
           // eslint-disable-next-line no-await-in-loop
           if (!(await this.elements.uploadPleaseWait.visible())) break;
         }

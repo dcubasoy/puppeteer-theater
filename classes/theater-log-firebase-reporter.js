@@ -2,7 +2,7 @@ const assert = require('assert');
 const util = require('util');
 const winston = require('winston');
 const shortid = require('shortid');
-const Storage = require('@google-cloud/storage');
+const { Storage } = require('@google-cloud/storage');
 
 const Show = require('./theater/show');
 

@@ -20,7 +20,7 @@ class FacebookIncorrectPasswordScene extends FacebokJustClickAwareScene.WithSpin
 
   async play() {
     await super.play();
-    throw new Error((500, 'login-error-incorrect-password');
+    throw new Error('login-error-incorrect-password');
   }
 }
 

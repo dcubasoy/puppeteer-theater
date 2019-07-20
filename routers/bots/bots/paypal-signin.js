@@ -66,6 +66,5 @@ module.exports = {
   lazy: true,
   async run(spec) {
     return runBot(spec);
-  },
-  router: TemplateSignInBot.router(name),
+  }
 };
