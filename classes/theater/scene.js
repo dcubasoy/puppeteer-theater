@@ -1,7 +1,8 @@
 const util = require('util');
 const debug = require('debug');
 const SceneExtensions = require('./scene-extensions');
-const PromiseCondition = require('../../promise-condition');const PuppeteerBotElement = require('./puppeteer-bot-element');
+const PromiseCondition = require('./promise-condition');
+const PuppeteerBotElement = require('./puppeteer-bot-element');
 
 
 

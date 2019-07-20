@@ -7,7 +7,8 @@ const debug = require('debug')('theater:show');
 const shortid = require('shortid');
 const util = require('util');
 const packageJson = require('../../package.json');
-const PromiseCondition = require('../../promise-condition');const Scene = require('./scene');
+const PromiseCondition = require('./promise-condition');
+const Scene = require('./scene');
 
 shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
 

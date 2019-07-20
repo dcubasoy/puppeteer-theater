@@ -78,14 +78,6 @@ class PuppeteerBotElement {
     return (await this.show.bot()).page.select(this.query.selector, ...value);
   }
 
-  /**
-   * @description Dirty-select: will click on the element safely in DOM, begin typing query specified in opt, force keydown 'TAB'. Exists out of neccesity- select by value is still buggy with many sites.0
-   *
-   * @param {any} opt: The text to select in the dropdown/select box (can be partial text).
-   * @returns:
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async $select(opt) {
     if (!opt) {
       this.scene.log('Element:', this.query.selector, 'select-empty');
@@ -133,14 +125,6 @@ class PuppeteerBotElement {
     }
   }
 
-  /**
-   * @description : Returns a Promise<Boolean> indciating whether the given scene has matched or not.
-   *
-   * @param {any} matchContext
-   * @returns
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async match(matchContext) {
     if (this.query.visibility === 'optional') return true;
     if (/^required:/.test(this.query.visibility)) {
@@ -153,41 +137,19 @@ class PuppeteerBotElement {
     return ((await this.visible()) ^ (this.query.visibility === 'required')) === 0;
   }
 
-
-  /**
-   * @description Extracts table content as an array of (potentially) nested JSON objects.
-   *
-   * @param {Object} [args={ stripHtml = true }] For specifying arguments to tabletojson.convert().
-   * @returns
-   *
-   * @memberOf PuppeteerBotElement
-   */
-  async tableContent(args = { stripHtml = true }) {
+  async tableContent(opts = { stripHtml: true }) {
     const els = await this.visibleElementHandles();
     let content = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).outerHTML || '').trim(), el)));
     content = content.filter(s => !!s).join('\n');
-    return tabletojson.convert(content, args);
+
+    this.scene.log('Element:', this.query.selector, 'tableContent', 'extractedRows:', content.length);
+    return tabletojson.convert(content, opts);
   }
 
-
-  /**
-   * @description Returns array [] of Node element attributes 'textContent'
-   * @returns {Array<string>}
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async textContents() {
     return this.textContent({ asArray: true });
   }
 
-
-   /**
-   * @description Returns new-line delimited string (rather than array) of every node in DOM's attribute `textContent`
-   *
-   * @returns {Array<string>}
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async textContent({ asArray = false } = {}) {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).textContent || '').trim(), el)));
@@ -197,14 +159,6 @@ class PuppeteerBotElement {
     return strs.filter(s => !!s).join('\n');
   }
 
-  /**
-   * @description Returns new-line delimited string (rather than array) of every node in DOM's attribute `innerText`
-   *
-   * @param {Object} [{ asArray = false }={}]
-   * @returns
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async innerText({ asArray = false } = {}) {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).innerText || '').trim(), el)));
@@ -214,25 +168,10 @@ class PuppeteerBotElement {
     return strs.filter(s => !!s).join('\n');
   }
 
-  /**
-   * @description Returns new-line delimited string of all query selector all's innerTexts as Array.
-   *
-   * @returns {Array<string>}
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async innerTexts() {
     return this.innerText({ asArray: true });
   }
 
-  /**
-   * @description Core interaction function of puppeteer-bot-element. Clicks an element using puppeteer-bot function: fillElementHandle.
-   *
-   * @param {any} opt
-   * @returns {Promise<Boolean>} Whether or not elements matching query have been filled.
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async fill(opt) {
     if (!opt) {
       this.scene.log('Element:', this.query.selector, 'fill-empty');
@@ -253,14 +192,6 @@ class PuppeteerBotElement {
   }
 
 
-  /**
-   * @description Checks or un-checks an element using puppeteer-bot function: `checkElementHandle`.
-   *
-   * @param {checked} {boolean}
-   * @returns {Promise<Boolean>} Whether or not element has been checked or not.
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async check(checked) {
     this.scene.log('Element:', this.query.selector, 'check');
     const elements = await this.visibleElementHandles();
@@ -274,12 +205,6 @@ class PuppeteerBotElement {
     return worked;
   }
 
-  /**
-   * @description Checks elements have been checked properly.
-   *
-   * @returns {Promise<Boolean>} Whether or not elements matching query have been checked.
-   * @memberOf PuppeteerBotElement
-   */
   async checked() {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(
@@ -288,14 +213,6 @@ class PuppeteerBotElement {
     return strs.filter(s => !!s).length === strs.length;
   }
 
-  /**
-   * @description Core interaction function of puppeteer-bot-element. Clicks an element using puppeteer-bot function: clickElementHandle.
-   *
-   * @param {Object} [{ once = false }={}] If clicking first element only is desired behavior, use `{ once: true }`
-   * @returns {Promise<Boolean>} Whether or not element has been clicked or not.
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async click({ once = false } = {}) {
     this.scene.log('Element:', this.query.selector, 'click');
     const elements = await this.visibleElementHandles();
@@ -319,53 +236,23 @@ class PuppeteerBotElement {
   }
 
 
-  /**
-   * @description Evaluates all visible element handles and extracts the `value` property of the given ElementHandle.
-   *
-   * @returns
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async value() {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).value || '').trim(), el)));
     return strs.filter(s => !!s)[0] || (els.length > 0 ? '' : undefined);
   }
 
-  /**
-   * @description Returns all values for given element query.
-   *
-   * @returns {Promise{Array<string>}}
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async values() {
     const els = await this.visibleElementHandles();
     const strs = await Promise.all(els.map(async el => (await this.show.bot()).page.evaluate(e => ((e || {}).value || '').trim(), el)));
     return strs;
   }
 
-  /**
-   * @description: Returns screenshot of given element (note: element must be visible).
-   *
-   * @returns {Promise{Array<string>}}
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async screenshot() {
     const els = await this.visibleElementHandles();
     return els[0].screenshot();
   }
 
-  /**
-   * @description
-   *
-   * @param {any} func
-   * @param {any} args
-   * @returns
-   *
-   * @memberOf PuppeteerBotElement
-   */
   async eval(func, ...args) {
     return (await this.show.bot()).$$safeEval(this.query.selector, func, ...args);
   }

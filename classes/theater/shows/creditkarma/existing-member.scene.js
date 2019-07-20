@@ -25,7 +25,7 @@ class CreditKarmaExistingMemberScene extends CreditKarmaJustClickAwareScene.With
       status: 'ExistingUser',
       email,
     });
-    throw new Error((500, 'ExistingAccount');
+    throw new Error('ExistingAccount');
   }
 }
 

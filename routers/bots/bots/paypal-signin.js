@@ -1,5 +1,6 @@
 const PayPalShow = require('../../../classes/theater/shows/paypal');
 const PuppeteerBot2a = require('../../../classes/puppeteer-bot-2a');
+const TheaterLogFirebaseReporter = require('../../../classes/theater-log-firebase-reporter');
 
 const BotResultReporter = require('../../../classes/bot-result-reporter');
 const name = 'paypal-signin';
@@ -33,7 +34,7 @@ async function runBot(spec) {
       botName: name,
     });
 
-    theaterLogReporter = new TheaterLogS3Reporter({
+    theaterLogReporter = new TheaterLogFirebaseReporter({
       show,
       bot,
       userId: spec.userId,

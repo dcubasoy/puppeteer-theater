@@ -6,7 +6,7 @@ const Storage = require('@google-cloud/storage');
 
 const Show = require('./theater/show');
 
-const gcs = Storage();
+const gcs = new Storage();
 
 class TheaterLogFirebaseReporter {
   constructor({
