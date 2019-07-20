@@ -54,14 +54,18 @@ The `Scene.Extensions` portion could be made way more powerful and I welcome PRs
 
 Read the docs for a detailed description of the whole API.
 
-### Tested & Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0.
+### Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0.
+References that are useful when reading this and any puppeteer code:
+	
+-  [Puppeteer docs] (https://pptr.dev/)
+ - [MDN docs] (https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 
- [Puppeteer docs] (https://pptr.dev/)
- [MDN docs] (https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-
+### WTF is this repo?
 The repo is just a basic RESTful API for you to execute bots and understand how the framework operates internally. To that end, you'll want to make sure to:
 `export DEBUG=theater*`
+
+Just do it.
 
 ### How to just rip and run?
 
@@ -71,6 +75,10 @@ The repo is just a basic RESTful API for you to execute bots and understand how 
 - npm install
 
 `export DEBUG=theater*`
+
+`npm start`
+
+
 
 # # Base Classes
 
@@ -628,8 +636,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNTg0MTU2NjIzLC04MTA0MzM2MzksNjQxOT
-QxMjI3LDkyNTc0MzUxNSwxMTA1OTM4NDAzLDc2NjY3Mjk5MCwx
-MDc3ODYwOTIwLC0xNzA4ODg5NjY1LC0xODkwMjExODE2LC0xMT
-U3NjAzNzI0LC0xOTEwNzIwNDJdfQ==
+eyJoaXN0b3J5IjpbMjA1MTc3MzgyOSwtODEwNDMzNjM5LDY0MT
+k0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAs
+MTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMT
+E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
