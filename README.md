@@ -17,7 +17,19 @@ NOTE: To check out the logging (which is another huge plus for this project), ma
 - Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theater-logs`
 
 Create these resources or you wont see anything except the console.
-`
+
+#### Bots I've added for demo/baseline purposes:
+`/bots/run/experian-extractor`: Extracts credit report from Experian + score.
+`/bots/run/creditkarma-extractor`: Extracts credit report from CreditKarma account + score.
+`/bots/run/facebook-signin`: Signs in using credentials, just grabs the session for now. Adding data extraction/more layers at some point.
+`/bots/run/paypal-signin` : Signs in using credentials, extracts data from account, saves session for later use.
+```{
+    "username": "1337gamemode",
+    "password": "njsnsuhfuf",
+    "userId": "1337gamemode.njsnsuhfuf"
+}
+```
+I tend to follow this convention with all of them. POST that using a REST client and boom, liftoff.
 
 I am a fan of firebase so all outgoing/egress stuff such as reporting account credentials/session data/etc is done using firestore. The code is pretty simple and configuring this to hook up to your own firebase should be as easy as replacing the credential file in the `config/` folder.
 ##  Purpose & Inspiration
@@ -658,9 +670,9 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTA2MjA3MzAyOSw1ODA1NjIzOTksMTkwMT
-gyMTU4MSwtMTk4ODcxMTMxOCwtODEwNDMzNjM5LDY0MTk0MTIy
-Nyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAsMTA3Nz
-g2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMTE1NzYw
-MzcyNCwtMTkxMDcyMDQyXX0=
+eyJoaXN0b3J5IjpbOTU1OTI2NTkzLDEwNjIwNzMwMjksNTgwNT
+YyMzk5LDE5MDE4MjE1ODEsLTE5ODg3MTEzMTgsLTgxMDQzMzYz
+OSw2NDE5NDEyMjcsOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2Nj
+cyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4
+MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
