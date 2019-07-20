@@ -1,3 +1,7 @@
+<a href="http://puppeteer.theater"><img src="https://i.imgur.com/oGlafjU.jpg" title="theater" alt="theater"></a>
+
+
+
 ## Updates: 07/14/2016
 
 - Added JSDoc for everything!
@@ -11,17 +15,26 @@ Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theat
 
 ##  Purpose & Inspiration
 
-In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.**
+In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.** It does not wait for navigations, its looking for a set of conditions that when evaluated and return true, execute some particular code. 
 
  On the highest level, it achieves this by dealing with units of work as: **Shows & Scenes**.
 
-A show **might describe an entire site, like "Capital One".** Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). Scenes describe how the page looks and you decide what the bot does. It's that simple! I am waiting on permission from Capital One to use this show as a demonstration. ❤️ Note: I cannot endorse violating any terms of use of anything legally speaking, but banks and other usual suspects are often good practice for seeing how well you can evade bot detection techniques. Or so I am told. 👮
+A show **might describe an entire site, like "Capital One".** 
 
+Within this show, your scene sets can play - for example: *SignIn* (for linking a user's capital one account using a bot), *ExtractStatements* (for extracting pdf statements from account). 
+
+Scenes describe how the page looks and you decide what the bot does. It's simple! ❤️ And dangerous- its perfect for account takeovers (or worse). Note: I cannot endorse violating any terms of use of anything legally speaking. But hypothetically, do no harm and call it a day.
+
+
+Lets dive in.
 Normally, when working with puppeteer, you will find yourself repeatedly calling- `waitForNavigation().`
 
 What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
 
-This is a core value proposition theater offers.
+- This is a one of many enhancements over plain pupepteer script theater offers.
+- Another one: EventEmitter. Consider you want to just `on('botCreatedAccount', (o) => doSomething(o));
+
+One line, just told us how to handle whenever our bot creates an account succesfully. Maybe we store the data, or spawn another bot to provision the account!
 
 By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manually to appear. No more `wait(5000)` dirty code that breaks in production due to network changes or any numberof factors.
 
@@ -29,10 +42,14 @@ Theater also offers extensions: powerful and easy to use tools that can solve pr
 1) recaptcha challenges
 2) generic captchas
 3) clicking all the annoying pop ups that screw up your automation (`.spinner`)
+4) Infinite Scrolling
 
-Read the docs for a detailed description.
+The `Scene.Extensions` portion could be made very powerful and I welcome PRs.
 
-Tested & Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0. Integration with selenium-webdriver is in process.
+Read the docs for a detailed description of the whole API.
+
+Tested & Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0.
+
 
  [Puppeteer docs] (https://pptr.dev/)
  [MDN docs] (https://developer.mozilla.org/en-US/docs/Web/JavaScript)
