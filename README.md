@@ -19,7 +19,10 @@ NOTE: To check out the logging (which is another huge plus for this project), ma
 Create these resources or you wont see anything except the console.
 
 Bots I've added for demo/baseline purposes:
-`experian-extracty
+`/bots/run/experian-extractor`
+`/bots/run/creditkarma-extractor`: Extracts 
+`/bots/run/facebook-signin`: Signs in using credentials, just grabs the session for now. Adding data extraction/more layers at some point.
+`/bots/run/paypal-signin` : Signs in using credentials, extracts data from account, saves session for later use.
 
 I am a fan of firebase so all outgoing/egress stuff such as reporting account credentials/session data/etc is done using firestore. The code is pretty simple and configuring this to hook up to your own firebase should be as easy as replacing the credential file in the `config/` folder.
 ##  Purpose & Inspiration
@@ -660,9 +663,9 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTI5NjM4OTM4OCwxMDYyMDczMDI5LDU4MD
-U2MjM5OSwxOTAxODIxNTgxLC0xOTg4NzExMzE4LC04MTA0MzM2
-MzksNjQxOTQxMjI3LDkyNTc0MzUxNSwxMTA1OTM4NDAzLDc2Nj
-Y3Mjk5MCwxMDc3ODYwOTIwLC0xNzA4ODg5NjY1LC0xODkwMjEx
-ODE2LC0xMTU3NjAzNzI0LC0xOTEwNzIwNDJdfQ==
+eyJoaXN0b3J5IjpbLTE1NzY4NjMwNjQsMTA2MjA3MzAyOSw1OD
+A1NjIzOTksMTkwMTgyMTU4MSwtMTk4ODcxMTMxOCwtODEwNDMz
+NjM5LDY0MTk0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3Nj
+Y2NzI5OTAsMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIx
+MTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
