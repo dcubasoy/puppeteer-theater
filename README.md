@@ -1,4 +1,4 @@
-<a href="http://puppeteer.theater"><img src="https://i.imgur.com/oGlafjU.jpg" title="theater" alt="th
+<a href="http://puppeteer.theater"><img src="https://i.imgur.com/oGlafjU.jpg" title="theater" alt="theater">
 
 ## Updates: 07/20/2019
 - Fixed the year below (lol).
@@ -646,8 +646,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQ3NDkyNjU2OSwtODEwNDMzNjM5LDY0MT
-k0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAs
-MTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMT
-E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
+eyJoaXN0b3J5IjpbLTE5ODg3MTEzMTgsLTgxMDQzMzYzOSw2ND
+E5NDEyMjcsOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2NjcyOTkw
+LDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLT
+ExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
