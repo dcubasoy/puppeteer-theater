@@ -50,22 +50,17 @@ class TheaterLogFirebaseReporter {
   }
 
   async gcsUpload(ContentType, filename, Body) {
-    try {
-      const options = {
-        destination: filename,
-        metadata: {
-          contentType: ContentType,
-        },
-        public: false,
-      };
+    const options = {
+      destination: filename,
+      metadata: {
+        contentType: ContentType,
+      },
+      public: false,
+    };
 
-      const dest = this.gcsKey(filename);
-      const file = this.bucket.file(dest);
-      await file.save(Body, options);
-    } catch (error) {
-      this.logger.error
-('gcsUpload', { error });
-    }
+    const dest = this.gcsKey(filename);
+    const file = this.bucket.file(dest);
+    await file.save(Body, options);
   }
 
   retainBotTask() {
@@ -95,8 +90,7 @@ class TheaterLogFirebaseReporter {
       this.gcsUpload('text/html', `${prefix}-page.html`, await this.bot.page.content());
       this.gcsUpload('image/png', `${prefix}-page.png`, screenshot);
     } catch (error) {
-      this.logger.error
-('botDump', { error });
+      this.logger.error('botDump', { error });
     } finally {
       this.releaseBotTask();
     }

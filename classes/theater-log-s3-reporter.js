@@ -57,8 +57,7 @@ class TheaterLogS3Reporter {
         Key: this.s3Key(filename),
       }).promise();
     } catch (error) {
-      this.logger.error
-('s3Upload', { error });
+      this.logger.error('s3Upload', { error });
     }
   }
 
@@ -89,8 +88,7 @@ class TheaterLogS3Reporter {
       this.upload('text/html', `${prefix}-page.html`, await this.bot.page.content());
       this.upload('image/png', `${prefix}-page.png`, screenshot);
     } catch (error) {
-      this.logger.error
-('botDump', { error });
+      this.logger.error('botDump', { error });
     } finally {
       this.releaseBotTask();
     }

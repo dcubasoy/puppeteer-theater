@@ -63,7 +63,7 @@ async function runBot(spec) {
 
     await show.play();
   } catch (error) {
-    console.error(`runBot-error-${error.message}`, await bot.dump());
+    logger.error(`runBot-error-${error.message}`, await bot.dump());
   } finally {
     if (theaterLogReporter) await theaterLogReporter.botFreePromise();
     if (reporter) await reporter.botFreePromise();

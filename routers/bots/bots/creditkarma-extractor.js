@@ -12,6 +12,7 @@ const logger = createLogger(name);
 async function runBot(spec) {
   const bot = new PuppeteerBot2a({
     trustChromeNativeRequest: true,
+    preferNonHeadless: true,
     logger,
     credential: spec.session, // this will clone all session/userData
   });
