@@ -16,7 +16,7 @@ NOTE: To check out the logging (which is another huge plus for this project), ma
 - Upload to S3: Bucket name is defined by: `process.env.S3_BUCKET_PREFIX-theater-logs`
 - Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theater-logs`
 
-I am a fan of firebase so all log
+I am a fan of firebase so all outgoing/egress stuff such as reporting account credentials/session data/etc is done using firestore. The code is pretty simple and configuring this to hook up to your own firebase should be as easy as replacing the credential file in the `config/` folder.
 ##  Purpose & Inspiration
 
 In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.** It does not wait for navigations, its looking for a set of conditions that when evaluated and return true, execute some particular code.
@@ -655,7 +655,7 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQxMjU3MzQ4NCw1ODA1NjIzOTksMTkwMT
+eyJoaXN0b3J5IjpbMTQyMDQ3NTQ4Myw1ODA1NjIzOTksMTkwMT
 gyMTU4MSwtMTk4ODcxMTMxOCwtODEwNDMzNjM5LDY0MTk0MTIy
 Nyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAsMTA3Nz
 g2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMTE1NzYw
