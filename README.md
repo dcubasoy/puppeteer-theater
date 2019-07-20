@@ -11,10 +11,12 @@ The wrapper still fails (and nothing to my knowledge chromium based) will also f
 - Generated new API documentation using an automated tool (thankfully...)
 - Added some issues/improvements I'd like to see made in the project
 - Added: 4 Shows to demonstrate a use-case where theater could be / was used for a very interesting purpose related to credential re-use attacks. Don't be stupid and don't be evil please.
-Upload to S3: Bucket name is defined by: `process.env.S3_BUCKET_PREFIX-theater-logs`
-Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theater-logs`
 
+NOTE: To check out the logging (which is another huge plus for this project), make sure to set your env.
+- Upload to S3: Bucket name is defined by: `process.env.S3_BUCKET_PREFIX-theater-logs`
+- Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theater-logs`
 
+I am a fan of firebase so all log
 ##  Purpose & Inspiration
 
 In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.** It does not wait for navigations, its looking for a set of conditions that when evaluated and return true, execute some particular code.
@@ -653,7 +655,7 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTQyMDQ2Nzg2MSw1ODA1NjIzOTksMTkwMT
+eyJoaXN0b3J5IjpbLTQxMjU3MzQ4NCw1ODA1NjIzOTksMTkwMT
 gyMTU4MSwtMTk4ODcxMTMxOCwtODEwNDMzNjM5LDY0MTk0MTIy
 Nyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAsMTA3Nz
 g2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMTE1NzYw
