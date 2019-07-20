@@ -13,7 +13,7 @@ class TheaterLogS3Reporter {
     show,
     bot,
     userId,
-    bucket = `${process.env.BUCKET_PREFIX}-theater-logs`,
+    bucket = `${process.env.GCLOUD_BUCKET_PREFIX}-theater-logs`,
     // eslint-disable-next-line no-shadow
     logger,
   }) {

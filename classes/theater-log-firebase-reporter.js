@@ -13,7 +13,7 @@ class TheaterLogFirebaseReporter {
     show,
     bot,
     userId,
-    bucket = 'puppeteer-bot-theater-logs',
+    bucket = `${process.env.S3_BUCKET_PREFIX}-theater-logs`,
     // eslint-disable-next-line no-shadow
     logger,
   }) {
