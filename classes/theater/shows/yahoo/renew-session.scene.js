@@ -41,7 +41,6 @@ class YahooRenewSessionScene extends YahooJustClickAwareScene.WithSpinner {
     await bot.deinit();
 
     this.log('reset proxy');
-    bot.proxy = await utils.getHTTPProxy();
 
     this.log('init');
     await bot.init();

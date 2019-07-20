@@ -166,7 +166,7 @@ class App extends React.Component {
             <h3 className="text-muted">{`${(window.bot)} bot poc`}</h3>
           </div>
 
-          <h4>Bot Configurations</h4>
+          <h4>Config</h4>
           <form className="form-horizontal">
             <div className="form-group">
               <label htmlFor="inputid" className="col-sm-2 control-label">ID</label>

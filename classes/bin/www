@@ -1,0 +1,23 @@
+#!/usr/bin/env node --harmony
+
+
+const { EventEmitter } = require('events');
+
+async function main() {
+  try {
+    const app = require('../app');
+    await new Promise((resolve, reject) => {
+      const listener = app.listen(process.env.PORT || 80, (err) => {
+        if (err) reject(err);
+        logger.info(`listening on ${listener.address().port}`);
+        resolve();
+      });
+    });
+  } catch (error) {
+    if (logger) logger.error(error.stack);
+    else console.error(error);
+    throw error;
+  }
+}
+
+main();

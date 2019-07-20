@@ -2,8 +2,6 @@ const PayPalShow = require('../../../classes/theater/shows/paypal');
 const PuppeteerBot2a = require('../../../classes/puppeteer-bot-2a');
 
 const BotResultReporter = require('../../../classes/bot-result-reporter');
-
-
 const name = 'paypal-signin';
 
 async function runBot(spec) {
@@ -13,7 +11,6 @@ async function runBot(spec) {
   });
 
   bot.userId = spec.userId;
-  bot.proxy = await utils.getHTTPProxy();
 
   let theaterLogReporter;
   let reporter;

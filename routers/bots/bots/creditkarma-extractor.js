@@ -51,7 +51,7 @@ async function runBot(spec) {
 
     show.on('creditDocumentBotResult', async (o) => { await reporter.onCreditDocumentBotResult(o); });
 
-    bot.goto('https://www.creditkarma.com/myfinances/creditreport/transunion/view/print#overview').catch(() => {});
+    bot.goto('https://www.creditkarma.com/myfinances/creditreport/transunion/view/print#overview').catch(() => { });
 
     await show.play();
   } catch (error) {

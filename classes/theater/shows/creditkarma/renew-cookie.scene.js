@@ -27,7 +27,6 @@ class CreditKarmaRenewCookieScene extends CreditKarmaJustClickAwareScene.Without
     await bot.deinit();
 
     this.log('reset proxy');
-    bot.proxy = await utils.getHTTPProxy();
 
     this.log('init');
     await bot.init();

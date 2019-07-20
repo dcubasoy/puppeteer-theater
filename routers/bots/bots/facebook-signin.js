@@ -50,7 +50,7 @@ async function runBot(spec) {
       await reporter.onRetailerBotResult(o);
     });
 
-    await bot.goto('https://www.facebook.com/login').catch(() => {});
+    await bot.goto('https://www.facebook.com/login').catch(() => { });
 
     await show.play();
   } catch (error) {
