@@ -63,7 +63,8 @@ class TheaterLogFirebaseReporter {
       const file = this.bucket.file(dest);
       await file.save(Body, options);
     } catch (error) {
-      this.console.error('gcsUpload', { error });
+      this.logger.error
+('gcsUpload', { error });
     }
   }
 
@@ -94,7 +95,8 @@ class TheaterLogFirebaseReporter {
       this.gcsUpload('text/html', `${prefix}-page.html`, await this.bot.page.content());
       this.gcsUpload('image/png', `${prefix}-page.png`, screenshot);
     } catch (error) {
-      this.console.error('botDump', { error });
+      this.logger.error
+('botDump', { error });
     } finally {
       this.releaseBotTask();
     }

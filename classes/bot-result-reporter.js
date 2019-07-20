@@ -48,7 +48,7 @@ class BotResultReporter {
     try {
       await db.collection('profiles').doc(this.userId).set({ accounts: admin.firestore.FieldValue.arrayUnion(obj) });
     } catch (error) {
-      this.console.error('onCreditAccountBotResult-failed to report', { error });
+      this.logger.error('onCreditAccountBotResult-failed to report', { error });
     }
   }
 
@@ -57,7 +57,7 @@ class BotResultReporter {
     try {
       await db.collection('reports').add(obj);
     } catch (error) {
-      this.console.error('onCreditDocumentBotResult-failed to report', { error });
+      this.logger.error('onCreditDocumentBotResult-failed to report', { error });
     }
   }
 
@@ -159,7 +159,7 @@ class BotResultReporter {
         session = await bot.exportCredential();
       }
     } catch (error) {
-      this.console.error('failed extracting session', { error });
+      this.logger.error('failed extracting session', { error });
     }
     // eslint-disable-next-line no-await-in-loop
     await new Promise(r => setTimeout(r, 100));

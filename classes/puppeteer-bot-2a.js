@@ -804,7 +804,8 @@ class PuppeteerBot2a {
         body: buffer.toString('base64'),
       })) || {}).text || '';
     } catch (error) {
-      this.console.error('failed-resolve-captcha', await this.dump({
+      this.logger.error
+('failed-resolve-captcha', await this.dump({
         error,
         buffer: buffer.toString('base64'),
       }));
@@ -852,7 +853,8 @@ class PuppeteerBot2a {
         });
       }
     } catch (error) {
-      this.console.error('failed-dump-content', {
+      this.logger.error
+('failed-dump-content', {
         error,
       });
     }
@@ -871,7 +873,8 @@ class PuppeteerBot2a {
         });
       }
     } catch (error) {
-      this.console.error('failed-dump-screenshot', {
+      this.logger.error
+('failed-dump-screenshot', {
         error,
       });
     }
@@ -912,7 +915,8 @@ class PuppeteerBot2a {
       await this.stopBrowser();
       await this.stopHealthCheck();
     } catch (error) {
-      this.console.error('deinit-error', {
+      this.logger.error
+('deinit-error', {
         error,
       });
     }
@@ -933,7 +937,8 @@ class PuppeteerBot2a {
     // prevent block
     redis.multi().hset(key, field, response).expire(key, 60 * 60 * 6).exec((error) => {
       if (error) {
-        this.console.error('redis-url-cache-store-error', {
+        this.logger.error
+('redis-url-cache-store-error', {
           error,
           url: req.url,
         });
@@ -958,7 +963,8 @@ class PuppeteerBot2a {
       parsed.body = Buffer.from(parsed.body, 'base64');
       return parsed;
     } catch (error) {
-      this.console.error('redis-url-cache-error', {
+      this.logger.error
+('redis-url-cache-error', {
         error,
         url: req.url,
       });
@@ -1112,7 +1118,8 @@ class PuppeteerBot2a {
         (async () => this.uploadToFirebase('image/png', `${Date.now()}-${name}.png`, await this.page.screenshot({ fullPage: true })))(),
       ]);
     } catch (error) {
-      this.console.error('error-captureToFirebase', {
+      this.logger.error
+('error-captureToFirebase', {
         error,
       });
     }
@@ -1133,7 +1140,8 @@ class PuppeteerBot2a {
       const file = bucket.file(dest);
       await file.save(Body, options);
     } catch (error) {
-      this.console.error('firebaseUpload', {
+      this.logger.error
+('firebaseUpload', {
         error,
       });
     }
@@ -1148,7 +1156,8 @@ class PuppeteerBot2a {
         })))(),
       ]);
     } catch (error) {
-      this.console.error('captureToS3', {
+      this.logger.error
+('captureToS3', {
         error,
       });
     }
@@ -1164,7 +1173,8 @@ class PuppeteerBot2a {
         Key: [process.env.NODE_ENV === 'production' ? 'prod' : 'dev', `${this.userId}/${filename}`].join('/'),
       }).promise();
     } catch (error) {
-      this.console.error('s3Upload', {
+      this.logger.error
+('s3Upload', {
         error,
       });
     }
@@ -1568,7 +1578,8 @@ class PuppeteerBot2a {
         await this.stopBrowser();
       }
     } catch (error) {
-      this.console.error('health-check-repeater-error', await this.dump({
+      this.logger.error
+('health-check-repeater-error', await this.dump({
         error,
       }));
     } finally {
@@ -1584,14 +1595,16 @@ class PuppeteerBot2a {
     this.healthCheckStartedAt = this.healthCheckStartedAt || Date.now();
 
     if (Date.now() - this.healthCheckStartedAt > this.browserTimeout) {
-      this.console.error('health-check-failed-browser-timeout', await this.dump());
+      this.logger.error
+('health-check-failed-browser-timeout', await this.dump());
       return false;
     }
 
     try {
       if (this.interaction && this.interaction.isUp) {
         if (!await this.interaction.checkValid()) {
-          this.console.error('health-check-failed-interaction-invalid', await this.dump());
+          this.logger.error
+('health-check-failed-interaction-invalid', await this.dump());
           return false;
         }
       }
@@ -1659,7 +1672,8 @@ class PuppeteerBot2a {
         this.logger.verbose(`fingerprint-maxmind-geoip-region-${region}`);
         this.logger.verbose(`fingerprint-maxmind-geoip-ip-range-${range}`);
       } catch (error) {
-        this.console.error(`maxmind-lookup-error-${Buffer.from(error.message).toString('base64')}`, {
+        this.logger.error
+(`maxmind-lookup-error-${Buffer.from(error.message).toString('base64')}`, {
           error,
         });
       }
@@ -1670,7 +1684,8 @@ class PuppeteerBot2a {
       if (/Session closed\. Most likely the page has been closed/.test(error.message)) return;
       if (/Protocol error \(Runtime\.callFunctionOn\): Target closed/.test(error.message)) return;
       if (/Session error \(Runtime\.callFunctionOn\): Message timed out/.test(error.message)) return;
-      this.console.error(`page-error-${Buffer.from(error.message).toString('base64')}`, {
+      this.logger.error
+(`page-error-${Buffer.from(error.message).toString('base64')}`, {
         error,
       });
     };
@@ -1707,9 +1722,7 @@ class PuppeteerBot2a {
       if (this.executablePath) options.executablePath = this.executablePath;
       this.browser = this.browserless ? await puppeteer.connect({ browserWSEndpoint: `wss://chrome.browserless.io/?token=${process.env.BROWSERLESS_KEY}` }) : await puppeteer.launch(options);
 
-
-      // eslint-disable-next-line no-return-assign
-      this.browser.on('disconnected', () => this.browser = null);
+      this.browser.on('error', () => errorListener);
 
       const version = await this.browser.version();
       this.logger.info(`puppeteer-current-chromium-revision:${version}`);
@@ -1783,7 +1796,8 @@ class PuppeteerBot2a {
         }
 
         // eslint-disable-next-line no-underscore-dangle
-        this.console.error(`request-failed-${interceptedReq._failureText}-${host}`, {
+        this.logger.error
+(`request-failed-${interceptedReq._failureText}-${host}`, {
           skipList: true,
         });
       });
@@ -1880,7 +1894,8 @@ class PuppeteerBot2a {
         await this.page.close();
       }
     } catch (error) {
-      this.console.error('failed-page-close', await this.dump({
+      this.logger.error
+('failed-page-close', await this.dump({
         error,
       }));
     } finally {
@@ -1892,7 +1907,8 @@ class PuppeteerBot2a {
         await this.browser.close();
       }
     } catch (error) {
-      this.console.error('failed-browser-close', await this.dump({
+      this.logger.error
+('failed-browser-close', await this.dump({
         error,
       }));
     } finally {
@@ -1905,7 +1921,8 @@ class PuppeteerBot2a {
           this.cleanUps[i]();
         } catch (error) {
           // eslint-disable-next-line no-await-in-loop
-          this.console.error('failed-call-cleanUp', await this.dump({
+          this.logger.error
+('failed-call-cleanUp', await this.dump({
             error,
           }));
         } finally {
@@ -1986,7 +2003,8 @@ class PuppeteerBot2a {
         try {
           await this.page.setCookie(cookie);
         } catch (error) {
-          this.console.error('failed-setting-cookie', await this.dump({
+          this.logger.error
+('failed-setting-cookie', await this.dump({
             cookie,
           }));
         }
@@ -2031,7 +2049,8 @@ class PuppeteerBot2a {
 
       return buf;
     } catch (error) {
-      this.console.error('error-getChromeUserData', {
+      this.logger.error
+('error-getChromeUserData', {
         error,
       });
       return Buffer.from('');
