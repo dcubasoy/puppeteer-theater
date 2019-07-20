@@ -78,8 +78,18 @@ Just do it.
 
 `npm start`
 
+```
+curl --request POST \
+  --url http://localhost/bots/paypal-signin/run \
+  --header 'content-type: application/json' \
+  --data '{
+    "username": "nico@nicomee.com",
+    "password": "hackedyourshit",
+    "userId": "nico@nicomee.com.hackedyourshit"
+}
+```
 
-
+Browser will launch, console output will show theater inner workings.
 # # Base Classes
 
 ## class: Show
@@ -636,7 +646,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjA1MTc3MzgyOSwtODEwNDMzNjM5LDY0MT
+eyJoaXN0b3J5IjpbLTQ3NDkyNjU2OSwtODEwNDMzNjM5LDY0MT
 k0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAs
 MTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMT
 E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
