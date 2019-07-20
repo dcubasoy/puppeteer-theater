@@ -62,7 +62,7 @@ class BotResultReporter {
   }
 
   async onRetailerBotResult(result) {
-    const obj = await this.resultCreditAccountReport(result);
+    const obj = await this.resultRetailerBotReport(result);
     try {
       await db.collection('botResults').add(obj);
       await redis.lpush('retailer-bot-consumer:', JSON.stringify(result));
@@ -76,6 +76,14 @@ class BotResultReporter {
   // --- Internal Functions (Results)
   // ==========================================================================================
 
+  /**
+   * @description Reporter for extraction of CreditReports from providers.
+   *
+   * @param {any} obj
+   * @returns
+   *
+   * @memberOf BotResultReporter
+   */
   async resultCreditAccountReport(obj) {
     const result = {
       statusVersion: new Date(),
@@ -87,6 +95,14 @@ class BotResultReporter {
     return Object.assign(result, obj);
   }
 
+  /**
+   * @description Reporter for the succesful creation of account with a credit provider.
+   *
+   * @param {any} obj
+   * @returns
+   *
+   * @memberOf BotResultReporter
+   */
   async resultCreditDocumentBotReport(obj) {
     const result = {
       statusVersion: new Date(),
@@ -95,6 +111,17 @@ class BotResultReporter {
       score: this.show.context('score') || 0,
     };
     return _.omit(Object.assign(result, obj), ['report']);
+  }
+
+  async resultRetailerBotReport(obj) {
+    const result = {
+      statusVersion: new Date(),
+      userId: this.userId,
+      status: obj.status || 'Linked',
+      session: obj.status === 'Linked' ? await this.session() : null,
+      botName: this.botName,
+    };
+    return Object.assign(result, obj);
   }
 
 
@@ -124,21 +151,18 @@ class BotResultReporter {
   async session() {
     let session;
     this.retainBotTask();
-    for (let i = 0; i < 100; i += 1) {
-      try {
+    try {
       // eslint-disable-next-line no-await-in-loop
-        const bot = await this.show.bot();
-        if (bot) {
-          // eslint-disable-next-line no-await-in-loop
-          session = await bot.exportCredential();
-        }
-        break;
-      } catch (error) {
-        this.console.error('failed extracting session', { error });
+      const bot = await this.show.bot();
+      if (bot) {
+        // eslint-disable-next-line no-await-in-loop
+        session = await bot.exportCredential();
       }
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise(r => setTimeout(r, 100));
+    } catch (error) {
+      this.console.error('failed extracting session', { error });
     }
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise(r => setTimeout(r, 100));
     this.releaseBotTask();
 
     const data = {
