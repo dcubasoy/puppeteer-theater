@@ -377,10 +377,10 @@ This object (**elementQueries**) will be unique to a particular scene, when the 
 - Writes file to temporary directory on disk, uploads file on given elements inside this PuppeteerBotElement, cleans up.
 - returns: <[Promise]<[boolean]>> whether file uploaded or not.
 
-####  element.tableContent()
+####  element.tableContent(opts)
 
 - returns table as an array of JSON objects (`good` for scraping)
-- params:
+- params: opts `{}` default arguments for tabletojson (refer to the documentation for this package)
 
 ####  element.eval(fn, ...args)
 
@@ -653,9 +653,9 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0MDE0ODMwOTQsNTgwNTYyMzk5LDE5MD
-E4MjE1ODEsLTE5ODg3MTEzMTgsLTgxMDQzMzYzOSw2NDE5NDEy
-MjcsOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2NjcyOTkwLDEwNz
-c4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2
-MDM3MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbMTQyMDQ2Nzg2MSw1ODA1NjIzOTksMTkwMT
+gyMTU4MSwtMTk4ODcxMTMxOCwtODEwNDMzNjM5LDY0MTk0MTIy
+Nyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAsMTA3Nz
+g2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMTE1NzYw
+MzcyNCwtMTkxMDcyMDQyXX0=
 -->
