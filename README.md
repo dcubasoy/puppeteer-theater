@@ -565,9 +565,9 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
 - 
 ##  class: Scene.Extensions.Scroll
 
- ### new Scene.Extension.Scroll(targetElementName, siteKeyFn)
+ ### new Scene.Extension.Scroll(time, repeats)
 
-- Simply Scrolls for the given time (in ms), and repeats scrollRepeats (default = 5) times. Designed for infinite scrolling scenarios..
+- Simply Scrolls for the given time (in ms), and repeats scrollRepeats (default = 5) times. Designed for infinite scrolling scenarios.
 
 ## Core Components
 Some of the syntax within Theater can seem intimidating but it is pretty simple once you understand the underlying components.
@@ -642,17 +642,18 @@ You can find some real-examples of this in the `classes/theater/shows` folder.
 
 These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page and add a test assertion in `show-tests/example` folder where `example` is your Show name. I'm looking to improve the way I'm currently handling the test setup & tear down with puppeteer. In conclusion, this project is in its infancy but it holds a great deal of promise for those immersed in web automation and scraping. I welcome any and all criticism or comments and will be contributing reguarly.
 
-## Contributing "rules"
+Run `node index
+
+## Contribution guidelines
 This is my first real open-source project that I'll be maintaining, I'd love contributions, questions, criticism, or guidance!
 
 ## Contact
-nicokokonas@mindwise.io
 
 [https://webscrapers.slack.com](https://webscrapers.slack.com/) for a prompt response, message me here!
 
-
+[https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExNjA3NzE0MjMsLTE5ODg3MTEzMTgsLT
+eyJoaXN0b3J5IjpbLTE5OTIyMTI2NzEsLTE5ODg3MTEzMTgsLT
 gxMDQzMzYzOSw2NDE5NDEyMjcsOTI1NzQzNTE1LDExMDU5Mzg0
 MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLT
 E4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
