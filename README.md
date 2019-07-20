@@ -562,6 +562,12 @@ However, if  all `Scene`s' curtain have fallen (show is over), this extension's 
  ### new Scene.Extension.ReCAPTCHAv2(targetElementName, siteKeyFn)
 
 - `targetElementName` is element name wherein `#g-recaptcha-response` is contained in child nodes of this element. Most often seen as `.g-recaptcha`. This extension will determine site-key from provided `siteKeyFn()`, solve recaptcha, use `getFrame()` if needed to properly set response, and invoke the  callback function (if present) to trigger the result after captcha has been solved.
+- 
+##  class: Scene.Extensions.Scroll
+
+ ### new Scene.Extension.Scroll(targetElementName, siteKeyFn)
+
+- Simply Scrolls for the given time (in ms), and repeats scrollRepeats (default = 5) times. Designed for infinite scrolling scenarios..
 
 ## Core Components
 Some of the syntax within Theater can seem intimidating but it is pretty simple once you understand the underlying components.
@@ -646,8 +652,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE5ODg3MTEzMTgsLTgxMDQzMzYzOSw2ND
-E5NDEyMjcsOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2NjcyOTkw
-LDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLT
-ExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbLTExNjA3NzE0MjMsLTE5ODg3MTEzMTgsLT
+gxMDQzMzYzOSw2NDE5NDEyMjcsOTI1NzQzNTE1LDExMDU5Mzg0
+MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLT
+E4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
