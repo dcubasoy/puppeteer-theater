@@ -47,12 +47,14 @@ Theater also offers extensions: powerful and easy to use tools that can solve pr
 2) generic captchas
 3) clicking all the annoying pop ups that screw up your automation (`.spinner`)
 4) Infinite Scrolling
+5) Custom function evaluations in browser context
+6) Delaying for a random or specified portion of time, to not appear like  a bot.
 
 The `Scene.Extensions` portion could be made way more powerful and I welcome PRs.
 
 Read the docs for a detailed description of the whole API.
 
-Tested & Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0.
+### Tested & Fully Compatible with both puppeteer@1.18.1 & puppeteer-firefox@0.5.0.
 
 
  [Puppeteer docs] (https://pptr.dev/)
@@ -626,8 +628,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTY1MjI5NDMxNSwtODEwNDMzNjM5LDY0MT
-k0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAs
-MTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMT
-E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
+eyJoaXN0b3J5IjpbNTg0MTU2NjIzLC04MTA0MzM2MzksNjQxOT
+QxMjI3LDkyNTc0MzUxNSwxMTA1OTM4NDAzLDc2NjY3Mjk5MCwx
+MDc3ODYwOTIwLC0xNzA4ODg5NjY1LC0xODkwMjExODE2LC0xMT
+U3NjAzNzI0LC0xOTEwNzIwNDJdfQ==
 -->
