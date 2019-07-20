@@ -254,7 +254,7 @@ class PuppeteerBot2a {
     minHeight = 1080,
     anonymizeReferer = false,
     logger,
-    urlCacheUseProxy = true,
+    urlCacheUseProxy = false,
     trustChromeNativeRequest = false,
     requestURLReplacer = r => r.url(),
     preferNonHeadless = false,
@@ -882,27 +882,6 @@ class PuppeteerBot2a {
   }
 
 
-  async initSpamBlocker() {
-    try {
-      const rules = (await Promise.all([
-        'https://raw.githubusercontent.com/keraf/NoCoin/master/src/blacklist.txt',
-        'https://raw.githubusercontent.com/xd4rker/MinerBlock/master/assets/filters.txt',
-      ].map(u => this.getURLCache({ url: u, headers: {} }))))
-        .map(r => r.body.toString())
-        .join('\n')
-        .split('\n')
-        .map(l => l.trim())
-        .filter(l => !/^#/.test(l)) // cancel out comments
-        .filter(l => !!l) // cancel out empty lines
-        .map(l => l.replace(/\*/g, '.*'))
-        .map(l => new RegExp(`^${l}$`, 'i'));
-
-      rules.forEach(r => this.requestSoftAbortRules.push(r));
-    } catch (error) {
-      this.console.error('failed init spam blocker', { error });
-    }
-  }
-
   async init() {
     if (this.revision) {
       const revisionInfo = await ChromiumFetcher.download(this.revision);
@@ -922,7 +901,6 @@ class PuppeteerBot2a {
     }
 
     await this.startBrowser();
-    await this.initSpamBlocker();
     await this.startHealthCheck();
 
     if (process.env.NODE_ENV !== 'production') {
@@ -946,21 +924,8 @@ class PuppeteerBot2a {
       url: req.url,
     });
 
-    let proxy;
-    if (this.urlCacheUseProxy) {
-      try {
-        proxy = await utils.getHTTPProxy();
-      } catch (error) {
-        this.console.error('redis-url-cache-proxy-error', {
-          error,
-          url: req.url,
-        });
-      }
-    }
-
     const response = await fetchURLResponse({
       req,
-      proxy,
       bot: this,
     });
 

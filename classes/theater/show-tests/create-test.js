@@ -2,8 +2,13 @@ const express = require('express');
 const path = require('path');
 const throat = require('throat');
 
-const PuppeteerBot = require('../../puppeteer-bot');
+const admin = require('firebase-admin');
+const serviceAccount = require('../../../config/firebase-admin-secure.json');
 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: process.env.FIREBASE_URI,
+});
 const app = express();
 
 const PORT = 27378;
@@ -26,16 +31,17 @@ const logger = () => ({
 });
 
 async function runTests() {
+  // eslint-disable-next-line global-require
+  const PuppeteerBot2a = require('../../puppeteer-bot-2a');
   app.use('/', express.static(path.join(__dirname, './')));
   await new Promise(r => app.listen(PORT, r));
 
-  // specify show to skip in test
   let showTestGrep;
   if (process.env.SHOW_TEST_GREP) {
     showTestGrep = new RegExp(process.env.SHOW_TEST_GREP, 'gi');
   }
 
-  await Promise.all(tests.map(throat(12, async ({ fn, setup }) => {
+  await Promise.all(tests.map(throat(8, async ({ fn, setup }) => {
     const testName = `${setup.Show.name}/${setup.name}`;
     if (showTestGrep && !showTestGrep.test(testName)) {
       process.stdout.write(`Test [${testName}]: skipping\n`);
@@ -44,12 +50,7 @@ async function runTests() {
 
     const startedAt = Date.now();
     let testStartedAt;
-
-    const bot = new PuppeteerBot({
-      minWidth: 1280,
-      minHeight: 1024,
-      disguiseFlags: ['--canvas'],
-      emulateFlag: 'mobile',
+    const bot = new PuppeteerBot2a({
       preferNonHeadless: true,
     });
 
@@ -59,6 +60,7 @@ async function runTests() {
       await bot.init();
 
       const show = new setup.Show({ Scenes: setup.Scenes, bot });
+      bot.interceptRequest = show.interceptRequest;
 
       testStartedAt = Date.now();
       // eslint-disable-next-line no-await-in-loop
@@ -66,6 +68,7 @@ async function runTests() {
 
       process.stdout.write(`Test [${testName}] (${testStartedAt - startedAt}ms prep, ${Date.now() - testStartedAt}ms test): ok\n`);
     } catch (error) {
+      console.trace(error);
       process.stderr.write(`Test [${testName}] (${testStartedAt - startedAt}ms prep, ${Date.now() - testStartedAt}ms test): ${error.stack}\n`);
       process.exit(1);
     } finally {
