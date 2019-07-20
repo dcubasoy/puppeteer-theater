@@ -10,8 +10,7 @@ The wrapper still fails (and nothing to my knowledge chromium based) will also f
 - Added JSDoc for everything!
 - Generated new API documentation using an automated tool (thankfully...)
 - Added some issues/improvements I'd like to see made in the project
-- Added: 4 Shows to demonstrate a use-case where theater could be / was used for a very interesting purpose. Aiming to submit a whitepaper before next DEFCON, but the smart ones can figure it out for yourself.
-
+- Added: 4 Shows to demonstrate a use-case where theater could be / was used for a very interesting purpose related to credential re-use attacks. Don't be stupid and don't be evil please.
 Upload to S3: Bucket name is defined by: `process.env.S3_BUCKET_PREFIX-theater-logs`
 Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theater-logs`
 
@@ -654,9 +653,9 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNTgwNTYyMzk5LDE5MDE4MjE1ODEsLTE5OD
-g3MTEzMTgsLTgxMDQzMzYzOSw2NDE5NDEyMjcsOTI1NzQzNTE1
-LDExMDU5Mzg0MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAsLTE3MD
-g4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3
-MjA0Ml19
+eyJoaXN0b3J5IjpbLTE0MDE0ODMwOTQsNTgwNTYyMzk5LDE5MD
+E4MjE1ODEsLTE5ODg3MTEzMTgsLTgxMDQzMzYzOSw2NDE5NDEy
+MjcsOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2NjcyOTkwLDEwNz
+c4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2
+MDM3MjQsLTE5MTA3MjA0Ml19
 -->
