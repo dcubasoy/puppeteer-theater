@@ -35,11 +35,12 @@ Normally, when working with puppeteer, you will find yourself repeatedly calling
 What if there were a way to simply provide the bot what it should see (on the page), and instruct it what to do when such conditions are met?
 
 - This is a one of many enhancements over plain pupepteer script theater offers.
-- Another one: EventEmitter. Consider you want to just `on('botCreatedAccount', (o) => doSomething(o));
+- Another one: EventEmitter. Consider you want to just:
+-  `on('botCreatedAccount', (o) => doSomething(o));`
 
-One line, just told us how to handle whenever our bot creates an account succesfully. Maybe we store the data, or spawn another bot to provision the account!
+You can define any custom events you wish.
 
-By definition, there is no need to call for `waitForNavigation` ever or otherwise wait for anything manually to appear. No more `wait(5000)` dirty code that breaks in production due to network changes or any numberof factors.
+One line, just told us how to handle whenever our bot creates an account succesfully. Maybe we store the data, or spawn another bot to provision the account! I love this pattern EventEmitter provides.
 
 Theater also offers extensions: powerful and easy to use tools that can solve problems in two lines of code like
 1) recaptcha challenges
@@ -47,7 +48,7 @@ Theater also offers extensions: powerful and easy to use tools that can solve pr
 3) clicking all the annoying pop ups that screw up your automation (`.spinner`)
 4) Infinite Scrolling
 
-The `Scene.Extensions` portion could be made very powerful and I welcome PRs.
+The `Scene.Extensions` portion could be made way more powerful and I welcome PRs.
 
 Read the docs for a detailed description of the whole API.
 
@@ -625,7 +626,7 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTY3MjI4MTkzOCwtODEwNDMzNjM5LDY0MT
+eyJoaXN0b3J5IjpbLTY1MjI5NDMxNSwtODEwNDMzNjM5LDY0MT
 k0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAs
 MTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMT
 E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
