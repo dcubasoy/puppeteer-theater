@@ -1,4 +1,11 @@
-## Updates: 07/14/2016
+## Updates: 07/26/2019
+- Corrected 2016 as the year below (lmmao)
+- Added new base class with more functionality and `check()` API method that will check against the well known bot master's challenges, including the latest 'are you headless?'. Its failing right now, but given pptr-firefox is passing as a stand-in + the API is 99% equivalent I doubt anyone is going that deep into your browser.
+
+-
+
+
+## Updates: 07/14/2019
 
 - Added JSDoc for everything!
 - Generated new API documentation using an automated tool (thankfully...)

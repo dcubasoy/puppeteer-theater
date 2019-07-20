@@ -132,7 +132,7 @@ class Show extends EventEmitter {
   /**
    * @description Returns the result when show has finished playing.
    *
-   * @returns {Promise<Show.Result>}
+   * @returns {Show.Result}
    *
    * @memberOf Show
    */
@@ -232,14 +232,12 @@ class Show extends EventEmitter {
     return scene;
   }
 
-  /**
-   * @description Play's the show, iterating through the resulting scenes looking for a match. Optional: Specify an IntialScene, and UntilScene to restrict bot operation.
-   *
-   * @param {any} [{ InitialScene, UntilScene }={}]
-   * @returns {any} TBD
-   *
-   * @memberOf Show
-   */
+/**
+ * @description Play's the show, iterating through the resulting scenes looking for a match. Optional: Specify an IntialScene, and UntilScene to restrict bot operation.
+ * @param {any} [{ InitialScene, UntilScene }={}]
+ * @returns {any} TBD
+ * @memberOf Show
+ */
   async play({ InitialScene, UntilScene } = {}) {
     this.emit('showStartPlay', await this.result());
 
