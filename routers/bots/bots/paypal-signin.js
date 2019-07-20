@@ -3,14 +3,17 @@ const PuppeteerBot2a = require('../../../classes/puppeteer-bot-2a');
 const TheaterLogFirebaseReporter = require('../../../classes/theater-log-firebase-reporter');
 
 const BotResultReporter = require('../../../classes/bot-result-reporter');
+const createLogger = require('../../../utils/logger');
 
 
 const name = 'paypal-signin';
+const logger = createLogger(name);
 
 async function runBot(spec) {
   const bot = new PuppeteerBot2a({
     trustChromeNativeRequest: true,
     preferNonHeadless: true,
+    logger,
   });
 
   bot.userId = spec.userId;
@@ -24,6 +27,7 @@ async function runBot(spec) {
     show = new PayPalShow({
       Scenes: PayPalShow.SceneSets.SignIn,
       bot,
+      logger,
     });
 
     show.setContext('userId', spec.userId);
@@ -33,6 +37,7 @@ async function runBot(spec) {
     reporter = new BotResultReporter({
       show,
       userId: spec.userId,
+      logger,
       botName: name,
     });
 
@@ -40,6 +45,7 @@ async function runBot(spec) {
       show,
       bot,
       userId: spec.userId,
+      logger,
     });
 
 
@@ -52,10 +58,7 @@ async function runBot(spec) {
     await bot.page.goto('https://www.paypal.com/signin', { referer: 'https://www.paypal.com', waitUntil: 'networkidle0' });
     await show.play();
   } catch (error) {
-    logger.error(`runBot-error-${error.message}`, await bot.dump({
-      error,
-      bypassRateLimit: true,
-    }));
+    logger.error(`runBot-error-${error.message}`, await bot.dump());
   } finally {
     if (theaterLogReporter) await theaterLogReporter.botFreePromise();
     if (reporter) await reporter.botFreePromise();
@@ -68,5 +71,5 @@ module.exports = {
   lazy: true,
   async run(spec) {
     return runBot(spec);
-  }
+  },
 };

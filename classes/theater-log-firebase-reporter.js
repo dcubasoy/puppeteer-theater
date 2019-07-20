@@ -1,8 +1,8 @@
 const assert = require('assert');
 const util = require('util');
-const winston = require('winston');
 const shortid = require('shortid');
 const { Storage } = require('@google-cloud/storage');
+const createLogger = require('../utils/logger');
 
 const Show = require('./theater/show');
 
@@ -14,6 +14,8 @@ class TheaterLogFirebaseReporter {
     bot,
     userId,
     bucket = 'puppeteer-bot-theater-logs',
+    // eslint-disable-next-line no-shadow
+    logger,
   }) {
     assert(show instanceof Show, 'emitter is not instance of Show');
 
@@ -24,7 +26,7 @@ class TheaterLogFirebaseReporter {
     this.userId = userId || shortid.generate();
     this.incrValue = 0;
     this.bucket = gcs.bucket(bucket);
-    this.logger = this.logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
+    this.logger = logger || createLogger(userId);
 
 
     this.botTasksCount = 0;

@@ -2,9 +2,9 @@ const AWS = require('aws-sdk');
 const shortid = require('shortid');
 const assert = require('assert');
 const util = require('util');
-const winston = require('winston');
 const Show = require('./theater/show');
 
+const createLogger = require('../utils/logger');
 
 const s3 = new AWS.S3();
 
@@ -12,7 +12,9 @@ class TheaterLogS3Reporter {
   constructor({
     show,
     bot,
+    userId,
     bucket = `${process.env.BUCKET_PREFIX}-theater-logs`,
+    // eslint-disable-next-line no-shadow
     logger,
   }) {
     assert(show instanceof Show, 'emitter is not instance of Show');
@@ -20,7 +22,7 @@ class TheaterLogS3Reporter {
     this.startedAt = new Date();
     this.show = show;
     this.bot = bot;
-    this.logger = logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
+    this.logger = logger || createLogger(userId);
 
     this.userId = userId || shortid.v4();
     this.incrValue = 0;

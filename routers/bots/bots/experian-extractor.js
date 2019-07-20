@@ -5,12 +5,15 @@ const PuppeteerBot2a = require('../../../classes/puppeteer-bot-2a');
 
 const BotResultReporter = require('../../../classes/bot-result-reporter');
 const TheaterLogFirebaseReporter = require('../../../classes/theater-log-firebase-reporter');
+const createLogger = require('../../../utils/logger');
 
 const name = 'experian-extractor';
+const logger = createLogger(name);
 
 async function runBot(spec) {
   const bot = new PuppeteerBot2a({
     userId: spec.userId,
+    logger,
     preferNonHeadless: true,
   });
   bot.userId = spec.userId;
@@ -24,6 +27,7 @@ async function runBot(spec) {
     show = new ExperianShow({
       Scenes: ExperianShow.SceneSets.ExtractReport,
       bot,
+      logger,
       timeout: 5 * 60 * 1000,
     });
 
@@ -31,9 +35,11 @@ async function runBot(spec) {
     show.setContext('username', spec.username);
     show.setContext('password', spec.password);
 
+
     reporter = new BotResultReporter({
       show,
       userId: spec.userId,
+      logger,
       botName: name,
     });
 
@@ -41,6 +47,7 @@ async function runBot(spec) {
       show,
       bot,
       userId: spec.userId,
+      logger,
     });
 
 

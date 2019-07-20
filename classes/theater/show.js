@@ -1,6 +1,5 @@
 const assert = require('assert');
 const fs = require('fs');
-const winston = require('winston');
 const path = require('path');
 const EventEmitter = require('events');
 const debug = require('debug')('theater:show');
@@ -9,6 +8,7 @@ const util = require('util');
 const packageJson = require('../../package.json');
 const PromiseCondition = require('./promise-condition');
 const Scene = require('./scene');
+const createLogger = require('../../utils/logger');
 
 shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
 
@@ -88,7 +88,7 @@ class Show extends EventEmitter {
     super();
 
     this.ref = shortid.generate();
-    this.logger = logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
+    this.logger = logger || createLogger('theater/show');
 
     this.ctx = {};
     this.Scenes = Scenes || Object.values(this.constructor.Scenes) || [];

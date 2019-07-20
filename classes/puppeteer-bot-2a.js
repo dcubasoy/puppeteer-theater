@@ -33,6 +33,8 @@ const { Storage } = require('@google-cloud/storage');
 const UserAgent = require('user-agents');
 const geoip = require('geoip-lite');
 
+const createLogger = require('../utils/logger');
+
 // eslint-disable-next-line prefer-destructuring
 const detectFingerprinting = require('./theater/monitorExecution').detectFingerprinting;
 
@@ -253,7 +255,6 @@ class PuppeteerBot2a {
     minWidth = 1024,
     minHeight = 1080,
     anonymizeReferer = false,
-    logger,
     urlCacheUseProxy = false,
     trustChromeNativeRequest = false,
     requestURLReplacer = r => r.url(),
@@ -261,6 +262,7 @@ class PuppeteerBot2a {
     disguiseFlags = [],
     emulateFlag = 'desktop',
     revision,
+    logger,
     executablePath,
     browserless = false,
     enableRequestInterception = true,
@@ -277,7 +279,7 @@ class PuppeteerBot2a {
     this.cleanUps = [];
     this.requestIds = [];
 
-    this.logger = logger || winston.createLogger([new winston.transports.Console({ colorize: true })]);
+    this.logger = logger || createLogger(this.label);
     this.label = label;
 
     this.healthCheckTimeout = undefined;
@@ -328,6 +330,7 @@ class PuppeteerBot2a {
    */
   static async disguisePage(page, browserContext, {
     browserUniqueID = uuid.v4(),
+    // eslint-disable-next-line no-shadow
     logger,
     minWidth = 1280,
     minHeight = 1024,
@@ -664,6 +667,7 @@ class PuppeteerBot2a {
 
     await page.evaluateOnNewDocument(() => {
       const originalQuery = window.navigator.permissions.query;
+      // eslint-disable-next-line no-undef
       window.navigator.permissions.__proto__.query = parameters => (parameters.name === 'notifications'
         ? Promise.resolve({ state: Notification.permission })
         : originalQuery(parameters));
@@ -883,11 +887,6 @@ class PuppeteerBot2a {
 
 
   async init() {
-    if (this.revision) {
-      const revisionInfo = await ChromiumFetcher.download(this.revision);
-      this.executablePath = revisionInfo.executablePath;
-    }
-
     if (this.credential) {
       await this.importCredential(this.credential);
     } else if (this.chromeUserData) {
@@ -2013,6 +2012,7 @@ class PuppeteerBot2a {
       const buf = await streamToBuffer(await tar.c({
         gzip: true,
         cwd: this.userDataDir,
+        // eslint-disable-next-line no-shadow
         filter(path) {
           if (/BrowserMetrics-active\.pma$/i.test(path)) return false;
           if (/\/Favicons(-journal)?$/.test(path)) return false;

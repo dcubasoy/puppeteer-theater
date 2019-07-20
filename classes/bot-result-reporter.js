@@ -62,7 +62,7 @@ class BotResultReporter {
   }
 
   async onRetailerBotResult(result) {
-    const obj = await this.resultRetailerBotReport(result);
+    const obj = await this.resultCreditAccountReport(result);
     try {
       await db.collection('botResults').add(obj);
       await redis.lpush('retailer-bot-consumer:', JSON.stringify(result));

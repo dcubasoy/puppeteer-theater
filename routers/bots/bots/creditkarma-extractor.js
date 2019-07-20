@@ -3,14 +3,16 @@ const PuppeteerBot2a = require('../../../classes/puppeteer-bot-2a');
 
 const BotResultReporter = require('../../../classes/bot-result-reporter');
 const TheaterLogFirebaseReporter = require('../../../classes/theater-log-firebase-reporter');
+const createLogger = require('../../../utils/logger');
 
 
 const name = 'creditkarma-extractor';
+const logger = createLogger(name);
 
 async function runBot(spec) {
-
   const bot = new PuppeteerBot2a({
     trustChromeNativeRequest: true,
+    logger,
     credential: spec.session, // this will clone all session/userData
   });
 
@@ -25,6 +27,7 @@ async function runBot(spec) {
     show = new CreditKarmaShow({
       Scenes: CreditKarmaShow.SceneSets.ExtractReport,
       bot,
+      logger,
       timeout: 2 * 60 * 1000,
     });
 
@@ -35,6 +38,7 @@ async function runBot(spec) {
     reporter = new BotResultReporter({
       show,
       userId: spec.userId,
+      logger,
       botName: name,
     });
 
@@ -42,6 +46,7 @@ async function runBot(spec) {
       show,
       bot,
       userId: spec.userId,
+      logger,
     });
 
     show.on('showStartPlay', o => theaterLogReporter.onShowStartPlay(o));
@@ -55,7 +60,7 @@ async function runBot(spec) {
 
     await show.play();
   } catch (error) {
-    console.error(`runBot-error-${error.message}`, await bot.dump());
+    logger.error(`runBot-error-${error.message}`, await bot.dump());
     return { error: error.message };
   } finally {
     if (theaterLogReporter) await theaterLogReporter.botFreePromise();

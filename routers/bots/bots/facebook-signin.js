@@ -2,8 +2,10 @@ const FacebookShow = require('../../../classes/theater/shows/facebook');
 const PuppeteerBot2a = require('../../../classes/puppeteer-bot-2a');
 const BotResultReporter = require('../../../classes/bot-result-reporter');
 const TheaterLogFirebaseReporter = require('../../../classes/theater-log-firebase-reporter');
+const createLogger = require('../../../utils/logger');
 
 const name = 'facebook-signin';
+const logger = createLogger(name);
 
 async function runBot(spec) {
   const bot = new PuppeteerBot2a({
@@ -21,6 +23,7 @@ async function runBot(spec) {
     show = new FacebookShow({
       Scenes: FacebookShow.SceneSets.SignIn,
       bot,
+      logger,
       timeout: 5 * 60 * 1000,
     });
 
@@ -28,10 +31,10 @@ async function runBot(spec) {
     show.setContext('username', spec.username);
     show.setContext('password', spec.password);
 
-
     reporter = new BotResultReporter({
       show,
       userId: spec.userId,
+      logger,
       botName: name,
     });
 
@@ -39,7 +42,9 @@ async function runBot(spec) {
       show,
       bot,
       userId: spec.userId,
+      logger,
     });
+
 
     show.on('showStartPlay', o => theaterLogReporter.onShowStartPlay(o));
     show.on('showEndPlay', o => theaterLogReporter.onShowEndPlay(o));
@@ -54,7 +59,7 @@ async function runBot(spec) {
 
     await show.play();
   } catch (error) {
-    console.error(`runBot-error-${error.message}`, await bot.dump());
+    logger.error(`runBot-error-${error.message}`, await bot.dump());
   } finally {
     if (theaterLogReporter) await theaterLogReporter.botFreePromise();
     if (reporter) await reporter.botFreePromise();
