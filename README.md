@@ -1,8 +1,10 @@
 <a href="http://puppeteer.theater"><img src="https://i.imgur.com/oGlafjU.jpg" title="theater" alt="theater"></a>
 
 
-
-## Updates: 07/14/2016
+## Updates: 07/20/2019
+- Fixed the year below (lol).
+- Added new base class, extensions for infinite scrolling, improved some of the internal detection
+## Updates: 07/14/20169
 
 - Added JSDoc for everything!
 - Generated new API documentation using an automated tool (thankfully...)
@@ -622,8 +624,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTgxMDQzMzYzOSw2NDE5NDEyMjcsOTI1Nz
-QzNTE1LDExMDU5Mzg0MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAs
-LTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLTExNTc2MDM3MjQsLT
-E5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbLTEwMzA5NTExNzIsLTgxMDQzMzYzOSw2ND
+E5NDEyMjcsOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2NjcyOTkw
+LDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLT
+ExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
 -->
