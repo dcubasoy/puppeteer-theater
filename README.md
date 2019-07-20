@@ -10,12 +10,16 @@ The wrapper still fails (and nothing to my knowledge chromium based) will also f
 - Added JSDoc for everything!
 - Generated new API documentation using an automated tool (thankfully...)
 - Added some issues/improvements I'd like to see made in the project
-- Added: 4 Shows to demonstrate a use-case where theater could be / was used for a very interesting purpose. Aiming to submit a whitepaper before next DEFCON, but the smart ones can figure it out for yourself.
+- Added: 4 Shows to demonstrate a use-case where theater could be / was used for a very interesting purpose related to credential re-use attacks. Don't be stupid and don't be evil please.
 
-Upload to S3: Bucket name is defined by: `process.env.S3_BUCKET_PREFIX-theater-logs`
-Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theater-logs`
+NOTE: To check out the logging (which is another huge plus for this project), make sure to set your env.
+- Upload to S3: Bucket name is defined by: `process.env.S3_BUCKET_PREFIX-theater-logs`
+- Upload to Firebase/Google Cloud Storage: `process.env.GCLOUD_BUCKET_PREFIX-theater-logs`
 
+Create these resources or you wont see anything except the console.
+`
 
+I am a fan of firebase so all outgoing/egress stuff such as reporting account credentials/session data/etc is done using firestore. The code is pretty simple and configuring this to hook up to your own firebase should be as easy as replacing the credential file in the `config/` folder.
 ##  Purpose & Inspiration
 
 In a sentence, **Theater automates anything and everything a human being is capable of performing on a site.** It does not wait for navigations, its looking for a set of conditions that when evaluated and return true, execute some particular code.
@@ -378,10 +382,10 @@ This object (**elementQueries**) will be unique to a particular scene, when the 
 - Writes file to temporary directory on disk, uploads file on given elements inside this PuppeteerBotElement, cleans up.
 - returns: <[Promise]<[boolean]>> whether file uploaded or not.
 
-####  element.tableContent()
+####  element.tableContent(opts)
 
 - returns table as an array of JSON objects (`good` for scraping)
-- params:
+- params: opts `{}` default arguments for tabletojson (refer to the documentation for this package)
 
 ####  element.eval(fn, ...args)
 
@@ -654,8 +658,9 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTkwMTgyMTU4MSwtMTk4ODcxMTMxOCwtOD
-EwNDMzNjM5LDY0MTk0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQw
-Myw3NjY2NzI5OTAsMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMT
-g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
+eyJoaXN0b3J5IjpbMTA2MjA3MzAyOSw1ODA1NjIzOTksMTkwMT
+gyMTU4MSwtMTk4ODcxMTMxOCwtODEwNDMzNjM5LDY0MTk0MTIy
+Nyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAsMTA3Nz
+g2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMTE1NzYw
+MzcyNCwtMTkxMDcyMDQyXX0=
 -->
