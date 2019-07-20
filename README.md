@@ -640,9 +640,10 @@ You can find some real-examples of this in the `classes/theater/shows` folder.
 
 ## Test Driven Development
 
-These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page and add a test assertion in `show-tests/example` folder where `example` is your Show name. I'm looking to improve the way I'm currently handling the test setup & tear down with puppeteer. In conclusion, this project is in its infancy but it holds a great deal of promise for those immersed in web automation and scraping. I welcome any and all criticism or comments and will be contributing reguarly.
+These modular nature of Theater lends itself well to a TDD approach - for each particular Scene just grab the html for that page and add a test assertion in `show-tests/example` folder where `example` is your Show name. 
 
-Run `node index
+
+Run `node index.js` after running `cd classes/theater/show-tests/`. This is my primitive test runner.
 
 ## Contribution guidelines
 This is my first real open-source project that I'll be maintaining, I'd love contributions, questions, criticism, or guidance!
@@ -653,8 +654,8 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE5OTIyMTI2NzEsLTE5ODg3MTEzMTgsLT
-gxMDQzMzYzOSw2NDE5NDEyMjcsOTI1NzQzNTE1LDExMDU5Mzg0
-MDMsNzY2NjcyOTkwLDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLT
-E4OTAyMTE4MTYsLTExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbMTkwMTgyMTU4MSwtMTk4ODcxMTMxOCwtOD
+EwNDMzNjM5LDY0MTk0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQw
+Myw3NjY2NzI5OTAsMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMT
+g5MDIxMTgxNiwtMTE1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
