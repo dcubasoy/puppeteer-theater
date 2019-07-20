@@ -1,9 +1,9 @@
-<a href="http://puppeteer.theater"><img src="https://i.imgur.com/oGlafjU.jpg" title="theater" alt="theater"></a>
-
+<a href="http://puppeteer.theater"><img src="https://i.imgur.com/oGlafjU.jpg" title="theater" alt="th
 
 ## Updates: 07/20/2019
 - Fixed the year below (lol).
-- Added new base class, extensions for infinite scrolling, improved some of the internal detection
+- Added new base class, extensions for infinite scrolling, improved some of the internal anit bot detection mechanisms due to challenge from [https://arh.antoinevastel.com/reports/stats/menu.html](https://arh.antoinevastel.com/reports/stats/menu.html)
+The wrapper still fails (and nothing to my knowledge chromium based) will also fail on his latest 'am i chrome headless?' page.
 ## Updates: 07/14/20169
 
 - Added JSDoc for everything!
@@ -624,8 +624,8 @@ nicokokonas@mindwise.io
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEwMzA5NTExNzIsLTgxMDQzMzYzOSw2ND
-E5NDEyMjcsOTI1NzQzNTE1LDExMDU5Mzg0MDMsNzY2NjcyOTkw
-LDEwNzc4NjA5MjAsLTE3MDg4ODk2NjUsLTE4OTAyMTE4MTYsLT
-ExNTc2MDM3MjQsLTE5MTA3MjA0Ml19
+eyJoaXN0b3J5IjpbMTYzODY2MTE2NiwtODEwNDMzNjM5LDY0MT
+k0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3NjY2NzI5OTAs
+MTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIxMTgxNiwtMT
+E1NzYwMzcyNCwtMTkxMDcyMDQyXX0=
 -->
