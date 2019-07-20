@@ -18,9 +18,9 @@ NOTE: To check out the logging (which is another huge plus for this project), ma
 
 Create these resources or you wont see anything except the console.
 
-Bots I've added for demo/baseline purposes:
-`/bots/run/experian-extractor`
-`/bots/run/creditkarma-extractor`: Extracts 
+#### Bots I've added for demo/baseline purposes:
+`/bots/run/experian-extractor`: Extracts credit report from Experian + score.
+`/bots/run/creditkarma-extractor`: Extracts credit report from CreditKarma account + score.
 `/bots/run/facebook-signin`: Signs in using credentials, just grabs the session for now. Adding data extraction/more layers at some point.
 `/bots/run/paypal-signin` : Signs in using credentials, extracts data from account, saves session for later use.
 
@@ -663,7 +663,7 @@ This is my first real open-source project that I'll be maintaining, I'd love con
 
 [https://keybase.io/nicomee](https://keybase.io/nicomee)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE1NzY4NjMwNjQsMTA2MjA3MzAyOSw1OD
+eyJoaXN0b3J5IjpbLTExMDM5MzIxMDAsMTA2MjA3MzAyOSw1OD
 A1NjIzOTksMTkwMTgyMTU4MSwtMTk4ODcxMTMxOCwtODEwNDMz
 NjM5LDY0MTk0MTIyNyw5MjU3NDM1MTUsMTEwNTkzODQwMyw3Nj
 Y2NzI5OTAsMTA3Nzg2MDkyMCwtMTcwODg4OTY2NSwtMTg5MDIx
