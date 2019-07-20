@@ -1,5 +1,6 @@
 const assert = require('assert');
 const fs = require('fs');
+const winston = require('winston');
 const path = require('path');
 const EventEmitter = require('events');
 const debug = require('debug')('theater:show');
@@ -87,7 +88,7 @@ class Show extends EventEmitter {
     super();
 
     this.ref = shortid.generate();
-    this.logger = logger;
+    this.logger = logger || winston.createLogger();
     this.ctx = {};
     this.Scenes = Scenes || Object.values(this.constructor.Scenes) || [];
     this.Scenes.forEach((S, i) => assert(S.prototype instanceof Scene, `Scenes[${i}] ${S.name} is not valid Scene`));

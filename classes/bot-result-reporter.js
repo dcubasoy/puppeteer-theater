@@ -1,14 +1,13 @@
 const assert = require('assert');
 const shortid = require('shortid');
+const winston = require('winston');
 const admin = require('firebase-admin');
 const _ = require('lodash');
 const Show = require('./theater/show');
-const logger = require('../routers/bots/logger');
 
 const redis = require('../utils/redis');
 
 const db = admin.firestore();
-
 
 
 /**
@@ -24,6 +23,7 @@ class BotResultReporter {
   constructor({
     show,
     userId,
+    logger,
     botName,
   }) {
     assert(show instanceof Show, 'emitter is not instance of Show');
@@ -32,7 +32,7 @@ class BotResultReporter {
     this.show = show;
     this.status = 'Linked';
     this.userId = userId || shortid.generate();
-    this.logger = logger;
+    this.logger = logger || winston.createLogger();
 
     this.botTasksCount = 0;
     this.botFreeResolves = [];
@@ -47,7 +47,6 @@ class BotResultReporter {
     const obj = await this.resultCreditAccountReport(result);
     try {
       await db.collection('profiles').doc(this.userId).set({ accounts: admin.firestore.FieldValue.arrayUnion(obj) });
-      await redis.lpush('credit-account-bot-consumer:', JSON.stringify(obj));
     } catch (error) {
       this.logger.error('onCreditAccountBotResult-failed to report', { error });
     }
@@ -57,7 +56,6 @@ class BotResultReporter {
     const obj = await this.resultCreditDocumentBotReport(result);
     try {
       await db.collection('reports').add(obj);
-      await redis.lpush('credit-document-bot-consumer:', JSON.stringify(obj));
     } catch (error) {
       this.logger.error('onCreditDocumentBotResult-failed to report', { error });
     }
